@@ -4,8 +4,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// CsvFreee仕訳 は仕訳データCSVの行を表す構造体です
-type CsvFreee仕訳 struct {
+// csvFreee仕訳 は仕訳データCSVの行を表す構造体です
+type csvFreee仕訳 struct {
 	FldNo               string
 	Fld取引日              string
 	Fld管理番号             string

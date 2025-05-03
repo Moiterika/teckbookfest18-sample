@@ -5,20 +5,20 @@ import (
 	"teckbookfest18-sample/domain"
 )
 
-// Query仕訳 はQuery仕訳インターフェースの実装です
-type Query仕訳 struct {
+// query仕訳 はQuery仕訳インターフェースの実装です
+type query仕訳 struct {
 	reader *csv.Reader // CSVリーダーをプライベートフィールドとして保持
 }
 
 // NewQuery仕訳 はQuery仕訳の新しいインスタンスを作成します
 func NewQuery仕訳(reader *csv.Reader) domain.Query仕訳 {
-	return &Query仕訳{
+	return &query仕訳{
 		reader: reader,
 	}
 }
 
 // Read は初期化時に設定されたCSVリーダーから仕訳データを読み取ります
-func (r *Query仕訳) Read() ([]*domain.Ent仕訳, error) {
+func (r *query仕訳) Read() ([]*domain.Ent仕訳, error) {
 	// 内部実装で使用するio層の型からdomain層の型に変換
 	records, err := readCsvFreee仕訳一覧(r.reader)
 	if err != nil {

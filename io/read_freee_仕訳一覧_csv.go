@@ -9,7 +9,7 @@ import (
 )
 
 // readCsvFreee仕訳一覧 はCSVリーダーから仕訳データを読み取ります
-func readCsvFreee仕訳一覧(r *csv.Reader) ([]*CsvFreee仕訳, error) {
+func readCsvFreee仕訳一覧(r *csv.Reader) ([]*csvFreee仕訳, error) {
 	r.Comma = ','
 	// r.FieldsPerRecord = -1
 	r.LazyQuotes = true // RFC 4180 に厳密に従わない不正なクォート（引用符）を無視
@@ -19,7 +19,7 @@ func readCsvFreee仕訳一覧(r *csv.Reader) ([]*CsvFreee仕訳, error) {
 		return nil, err
 	}
 
-	var records []*CsvFreee仕訳
+	var records []*csvFreee仕訳
 	rowNumber := 2
 	for {
 		row, err := r.Read()
@@ -55,7 +55,7 @@ func readCsvFreee仕訳一覧(r *csv.Reader) ([]*CsvFreee仕訳, error) {
 			return nil, fmt.Errorf("%d行目:貸方税率が整数以外です。値=%s", rowNumber, row[47])
 		}
 
-		rec := CsvFreee仕訳{
+		rec := csvFreee仕訳{
 			FldNo:       row[0],
 			Fld取引日:      row[1],
 			Fld管理番号:     row[2],
