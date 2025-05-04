@@ -24,7 +24,6 @@ func NewSQLite仕訳Repo(db *sql.DB) *repo仕訳 {
 func (r *repo仕訳) CreateTableIfNotExists() error {
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS 仕訳 (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			番号 TEXT,
 			取引日 TEXT,
 			管理番号 TEXT,
@@ -32,11 +31,11 @@ func (r *repo仕訳) CreateTableIfNotExists() error {
 			借方決算書表示名 TEXT,
 			借方勘定科目ショートカット1 TEXT,
 			借方勘定科目ショートカット2 TEXT,
-			借方金額 TEXT,
+			借方金額 BIGINT,
 			借方税区分 TEXT,
-			借方税金額 TEXT,
+			借方税金額 BIGINT,
 			借方内税外税 TEXT,
-			借方税率 TEXT,
+			借方税率 BIGINT,
 			借方軽減税率有無 TEXT,
 			借方取引先コード TEXT,
 			借方取引先名 TEXT,
@@ -68,11 +67,11 @@ func (r *repo仕訳) CreateTableIfNotExists() error {
 			貸方決算書表示名 TEXT,
 			貸方勘定科目ショートカット1 TEXT,
 			貸方勘定科目ショートカット2 TEXT,
-			貸方金額 TEXT,
+			貸方金額 BIGINT,
 			貸方税区分 TEXT,
-			貸方税金額 TEXT,
+			貸方税金額 BIGINT,
 			貸方内税外税 TEXT,
-			貸方税率 TEXT,
+			貸方税率 BIGINT,
 			貸方軽減税率有無 TEXT,
 			貸方取引先コード TEXT,
 			貸方取引先名 TEXT,
@@ -124,7 +123,8 @@ func (r *repo仕訳) CreateTableIfNotExists() error {
 			取引内容 TEXT,
 			登録した方法 TEXT,
 			経費精算申請番号 TEXT,
-			支払依頼申請番号 TEXT
+			支払依頼申請番号 TEXT,
+			PRIMARY KEY (仕訳ID, 仕訳行番号)
 		)
 	`)
 	return err
@@ -136,6 +136,13 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("トランザクション開始エラー: %w", err)
+	}
+
+	// 仕訳テーブルの内容をクリア (SQLite3では TRUNCATE がないため DELETE FROM を使用)
+	_, err = tx.Exec("DELETE FROM 仕訳")
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("テーブルクリアエラー: %w", err)
 	}
 
 	// INSERT用のプレースホルダーとフィールド名を構築
@@ -187,11 +194,11 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 			仕訳.Fld借方決算書表示名,
 			仕訳.Fld借方勘定科目ショートカット1,
 			仕訳.Fld借方勘定科目ショートカット2,
-			仕訳.Fld借方金額.String(),
+			仕訳.Fld借方金額.IntPart(),
 			仕訳.Fld借方税区分,
-			仕訳.Fld借方税金額.String(),
+			仕訳.Fld借方税金額.IntPart(),
 			仕訳.Fld借方内税外税,
-			仕訳.Fld借方税率.String(),
+			仕訳.Fld借方税率.IntPart(),
 			仕訳.Fld借方軽減税率有無,
 			仕訳.Fld借方取引先コード,
 			仕訳.Fld借方取引先名,
@@ -223,11 +230,11 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 			仕訳.Fld貸方決算書表示名,
 			仕訳.Fld貸方勘定科目ショートカット1,
 			仕訳.Fld貸方勘定科目ショートカット2,
-			仕訳.Fld貸方金額.String(),
+			仕訳.Fld貸方金額.IntPart(),
 			仕訳.Fld貸方税区分,
-			仕訳.Fld貸方税金額.String(),
+			仕訳.Fld貸方税金額.IntPart(),
 			仕訳.Fld貸方内税外税,
-			仕訳.Fld貸方税率.String(),
+			仕訳.Fld貸方税率.IntPart(),
 			仕訳.Fld貸方軽減税率有無,
 			仕訳.Fld貸方取引先コード,
 			仕訳.Fld貸方取引先名,
@@ -307,14 +314,12 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 	var 仕訳一覧 []*domain.Ent仕訳
 
 	for rows.Next() {
-		var id int
 		var 仕訳 domain.Ent仕訳
-		var 借方金額Str, 借方税金額Str, 借方税率Str string
-		var 貸方金額Str, 貸方税金額Str, 貸方税率Str string
+		var 借方金額, 借方税金額, 借方税率 int64
+		var 貸方金額, 貸方税金額, 貸方税率 int64
 
 		// 各フィールドをスキャン
 		err := rows.Scan(
-			&id,
 			&仕訳.FldNo,
 			&仕訳.Fld取引日,
 			&仕訳.Fld管理番号,
@@ -322,11 +327,11 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 			&仕訳.Fld借方決算書表示名,
 			&仕訳.Fld借方勘定科目ショートカット1,
 			&仕訳.Fld借方勘定科目ショートカット2,
-			&借方金額Str,
+			&借方金額,
 			&仕訳.Fld借方税区分,
-			&借方税金額Str,
+			&借方税金額,
 			&仕訳.Fld借方内税外税,
-			&借方税率Str,
+			&借方税率,
 			&仕訳.Fld借方軽減税率有無,
 			&仕訳.Fld借方取引先コード,
 			&仕訳.Fld借方取引先名,
@@ -358,11 +363,11 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 			&仕訳.Fld貸方決算書表示名,
 			&仕訳.Fld貸方勘定科目ショートカット1,
 			&仕訳.Fld貸方勘定科目ショートカット2,
-			&貸方金額Str,
+			&貸方金額,
 			&仕訳.Fld貸方税区分,
-			&貸方税金額Str,
+			&貸方税金額,
 			&仕訳.Fld貸方内税外税,
-			&貸方税率Str,
+			&貸方税率,
 			&仕訳.Fld貸方軽減税率有無,
 			&仕訳.Fld貸方取引先コード,
 			&仕訳.Fld貸方取引先名,
@@ -421,12 +426,12 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 		}
 
 		// 文字列から Decimal 型に変換
-		仕訳.Fld借方金額, _ = decimal.NewFromString(借方金額Str)
-		仕訳.Fld借方税金額, _ = decimal.NewFromString(借方税金額Str)
-		仕訳.Fld借方税率, _ = decimal.NewFromString(借方税率Str)
-		仕訳.Fld貸方金額, _ = decimal.NewFromString(貸方金額Str)
-		仕訳.Fld貸方税金額, _ = decimal.NewFromString(貸方税金額Str)
-		仕訳.Fld貸方税率, _ = decimal.NewFromString(貸方税率Str)
+		仕訳.Fld借方金額 = decimal.NewFromInt(借方金額)
+		仕訳.Fld借方税金額 = decimal.NewFromInt(借方税金額)
+		仕訳.Fld借方税率 = decimal.NewFromInt(借方税率)
+		仕訳.Fld貸方金額 = decimal.NewFromInt(貸方金額)
+		仕訳.Fld貸方税金額 = decimal.NewFromInt(貸方税金額)
+		仕訳.Fld貸方税率 = decimal.NewFromInt(貸方税率)
 
 		仕訳一覧 = append(仕訳一覧, &仕訳)
 	}
