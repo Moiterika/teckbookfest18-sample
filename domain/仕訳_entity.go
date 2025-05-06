@@ -6,7 +6,7 @@ import (
 
 // Ent仕訳 は仕訳データの1行を表す構造体です
 type Ent仕訳 struct {
-	FldNo               string
+	FldNo               int64
 	Fld取引日              string
 	Fld管理番号             string
 	Fld借方勘定科目           string
@@ -106,4 +106,6 @@ type Ent仕訳 struct {
 	Fld登録した方法           string
 	Fld経費精算申請番号         string
 	Fld支払依頼申請番号         string
+	// ここから追加項目
+	*Val仕訳詳細
 }

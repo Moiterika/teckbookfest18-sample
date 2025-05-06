@@ -26,7 +26,7 @@ func main() {
 	// 仕訳テーブルを作成
 	err = repo.CreateTableIfNotExists()
 	if err != nil {
-		log.Fatalf("仕訳テーブル作成エラー: %v", err)
+		log.Fatalf("仕訳テーブル群作成エラー: %v", err)
 	}
 
 	// CSVファイルを開く - 実際のCSVファイルパスに置き換えてください
@@ -45,7 +45,7 @@ func main() {
 	reader.Comma = ','       // 区切り文字を指定
 
 	// Query仕訳インスタンスを作成
-	query := io.NewQuery仕訳(reader)
+	query := io.NewQuery仕訳Csv(reader)
 
 	// CSVデータを読み取る
 	仕訳一覧, err := query.Read()

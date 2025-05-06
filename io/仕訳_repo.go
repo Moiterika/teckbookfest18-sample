@@ -24,7 +24,7 @@ func NewSQLite仕訳Repo(db *sql.DB) *repo仕訳 {
 func (r *repo仕訳) CreateTableIfNotExists() error {
 	_, err := r.db.Exec(`
 		CREATE TABLE IF NOT EXISTS 仕訳 (
-			番号 TEXT,
+			番号 BIGINT,
 			取引日 TEXT,
 			管理番号 TEXT,
 			借方勘定科目 TEXT,
@@ -127,6 +127,21 @@ func (r *repo仕訳) CreateTableIfNotExists() error {
 			PRIMARY KEY (仕訳ID, 仕訳行番号)
 		)
 	`)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.Exec(`
+		CREATE TABLE IF NOT EXISTS 仕訳詳細 (
+			仕訳ID TEXT,
+			仕訳行番号 TEXT,
+			計上年月 TEXT,
+			コストプール TEXT,
+			按分ルール1 TEXT,
+			按分ルール2 TEXT,
+			PRIMARY KEY (仕訳ID, 仕訳行番号)
+		)
+	`)
 	return err
 }
 
@@ -138,6 +153,7 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 		return fmt.Errorf("トランザクション開始エラー: %w", err)
 	}
 
+	// 仕訳テーブル洗い替え
 	// 仕訳テーブルの内容をクリア (SQLite3では TRUNCATE がないため DELETE FROM を使用)
 	_, err = tx.Exec("DELETE FROM 仕訳")
 	if err != nil {
@@ -172,12 +188,12 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 		placeholders[i] = "?"
 	}
 
-	query := fmt.Sprintf(`INSERT INTO 仕訳 (%s) VALUES (%s)`,
+	cmd := fmt.Sprintf(`INSERT INTO 仕訳 (%s) VALUES (%s)`,
 		strings.Join(fields, ", "),
 		strings.Join(placeholders, ", "))
 
 	// プリペアードステートメント作成
-	stmt, err := tx.Prepare(query)
+	stmt, err := tx.Prepare(cmd)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("プリペアードステートメント作成エラー: %w", err)
@@ -294,6 +310,58 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 		}
 	}
 
+	// 仕訳詳細テーブル洗い替え
+	// 仕訳詳細テーブルの内容をクリア (SQLite3では TRUNCATE がないため DELETE FROM を使用)
+	_, err = tx.Exec("DELETE FROM 仕訳詳細")
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("テーブルクリアエラー: %w", err)
+	}
+
+	// INSERT用のプレースホルダーとフィールド名を構築
+	fields = []string{
+		"仕訳ID",
+		"仕訳行番号",
+		"計上年月",
+		"コストプール",
+		"按分ルール1",
+		"按分ルール2",
+	}
+	placeholders = make([]string, len(fields))
+	for i := range placeholders {
+		placeholders[i] = "?"
+	}
+
+	cmd2 := fmt.Sprintf(`INSERT INTO 仕訳詳細 (%s) VALUES (%s)`,
+		strings.Join(fields, ", "),
+		strings.Join(placeholders, ", "))
+
+	// プリペアードステートメント作成
+	stmt2, err := tx.Prepare(cmd2)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("プリペアードステートメント作成エラー: %w", err)
+	}
+	defer stmt2.Close()
+
+	// 各仕訳詳細データを挿入
+	for _, 仕訳 := range 仕訳一覧 {
+		if 仕訳.Val仕訳詳細 != nil {
+			_, err = stmt2.Exec(
+				仕訳.Fld仕訳ID,
+				仕訳.Fld仕訳行番号,
+				仕訳.Fld計上年月,
+				仕訳.Fldコストプール,
+				仕訳.Fld按分ルール1,
+				仕訳.Fld按分ルール2,
+			)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("データ挿入エラー: %w", err)
+			}
+		}
+	}
+
 	// トランザクションをコミット
 	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("トランザクションコミットエラー: %w", err)
@@ -305,7 +373,120 @@ func (r *repo仕訳) Save(仕訳一覧 []*domain.Ent仕訳) error {
 // FindAll はデータベースから全ての仕訳データを取得します
 func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 	// 全ての仕訳データを取得するクエリ
-	rows, err := r.db.Query("SELECT * FROM 仕訳")
+	rows, err := r.db.Query(`
+SELECT
+    仕訳.番号
+    , 仕訳.取引日
+    , 仕訳.管理番号
+    , 仕訳.借方勘定科目
+    , 仕訳.借方決算書表示名
+    , 仕訳.借方勘定科目ショートカット1
+    , 仕訳.借方勘定科目ショートカット2
+    , 仕訳.借方金額
+    , 仕訳.借方税区分
+    , 仕訳.借方税金額
+    , 仕訳.借方内税外税
+    , 仕訳.借方税率
+    , 仕訳.借方軽減税率有無
+    , 仕訳.借方取引先コード
+    , 仕訳.借方取引先名
+    , 仕訳.借方取引先ショートカット1
+    , 仕訳.借方取引先ショートカット2
+    , 仕訳.借方品目
+    , 仕訳.借方品目ショートカット1
+    , 仕訳.借方品目ショートカット2
+    , 仕訳.借方補助科目名
+    , 仕訳.借方補助科目ショートカット1
+    , 仕訳.借方補助科目ショートカット2
+    , 仕訳.借方部門
+    , 仕訳.借方部門ショートカット1
+    , 仕訳.借方部門ショートカット2
+    , 仕訳.借方メモ
+    , 仕訳.借方メモショートカット1
+    , 仕訳.借方メモショートカット2
+    , 仕訳.借方セグメント1
+    , 仕訳.借方セグメント1ショートカット1
+    , 仕訳.借方セグメント1ショートカット2
+    , 仕訳.借方セグメント2
+    , 仕訳.借方セグメント2ショートカット1
+    , 仕訳.借方セグメント2ショートカット2
+    , 仕訳.借方セグメント3
+    , 仕訳.借方セグメント3ショートカット1
+    , 仕訳.借方セグメント3ショートカット2
+    , 仕訳.借方備考
+    , 仕訳.貸方勘定科目
+    , 仕訳.貸方決算書表示名
+    , 仕訳.貸方勘定科目ショートカット1
+    , 仕訳.貸方勘定科目ショートカット2
+    , 仕訳.貸方金額
+    , 仕訳.貸方税区分
+    , 仕訳.貸方税金額
+    , 仕訳.貸方内税外税
+    , 仕訳.貸方税率
+    , 仕訳.貸方軽減税率有無
+    , 仕訳.貸方取引先コード
+    , 仕訳.貸方取引先名
+    , 仕訳.貸方取引先ショートカット1
+    , 仕訳.貸方取引先ショートカット2
+    , 仕訳.貸方品目
+    , 仕訳.貸方品目ショートカット1
+    , 仕訳.貸方品目ショートカット2
+    , 仕訳.貸方補助科目名
+    , 仕訳.貸方補助科目ショートカット1
+    , 仕訳.貸方補助科目ショートカット2
+    , 仕訳.貸方部門
+    , 仕訳.貸方部門ショートカット1
+    , 仕訳.貸方部門ショートカット2
+    , 仕訳.貸方メモ
+    , 仕訳.貸方メモショートカット1
+    , 仕訳.貸方メモショートカット2
+    , 仕訳.貸方セグメント1
+    , 仕訳.貸方セグメント1ショートカット1
+    , 仕訳.貸方セグメント1ショートカット2
+    , 仕訳.貸方セグメント2
+    , 仕訳.貸方セグメント2ショートカット1
+    , 仕訳.貸方セグメント2ショートカット2
+    , 仕訳.貸方セグメント3
+    , 仕訳.貸方セグメント3ショートカット1
+    , 仕訳.貸方セグメント3ショートカット2
+    , 仕訳.貸方備考
+    , 仕訳.決算整理仕訳
+    , 仕訳.発行元
+    , 仕訳.作成日時
+    , 仕訳.更新日時
+    , 仕訳.承認状況仕訳承認
+    , 仕訳.申請者仕訳承認
+    , 仕訳.申請日時仕訳承認
+    , 仕訳.承認者仕訳承認
+    , 仕訳.承認日時仕訳承認
+    , 仕訳.作成者
+    , 仕訳.消費税経理処理方法
+    , 仕訳.取引ID
+    , 仕訳.口座振替ID
+    , 仕訳.振替伝票ID
+    , 仕訳.仕訳ID
+    , 仕訳.仕訳番号
+    , 仕訳.期末日取引フラグ
+    , 仕訳.取引支払日
+    , 仕訳.仕訳行番号
+    , 仕訳.仕訳行数
+    , 仕訳.レコード番号
+    , 仕訳.取引内容
+    , 仕訳.登録した方法
+    , 仕訳.経費精算申請番号
+    , 仕訳.支払依頼申請番号
+    , 仕訳詳細.計上年月
+    , 仕訳詳細.コストプール
+    , 仕訳詳細.按分ルール1
+    , 仕訳詳細.按分ルール2 
+FROM
+    仕訳 
+    LEFT OUTER JOIN 仕訳詳細 
+        ON 仕訳.仕訳ID = 仕訳詳細.仕訳ID 
+        AND 仕訳.仕訳行番号 = 仕訳詳細.仕訳行番号 
+ORDER BY
+    仕訳.番号
+`)
 	if err != nil {
 		return nil, fmt.Errorf("クエリ実行エラー: %w", err)
 	}
@@ -315,6 +496,7 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 
 	for rows.Next() {
 		var 仕訳 domain.Ent仕訳
+		var 計上年月, コストプール, 按分ルール1, 按分ルール2 sql.NullString
 		var 借方金額, 借方税金額, 借方税率 int64
 		var 貸方金額, 貸方税金額, 貸方税率 int64
 
@@ -420,6 +602,10 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 			&仕訳.Fld登録した方法,
 			&仕訳.Fld経費精算申請番号,
 			&仕訳.Fld支払依頼申請番号,
+			&計上年月,
+			&コストプール,
+			&按分ルール1,
+			&按分ルール2,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("データ取得エラー: %w", err)
@@ -432,7 +618,8 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 		仕訳.Fld貸方金額 = decimal.NewFromInt(貸方金額)
 		仕訳.Fld貸方税金額 = decimal.NewFromInt(貸方税金額)
 		仕訳.Fld貸方税率 = decimal.NewFromInt(貸方税率)
-
+		// 仕訳詳細のフィールドをセット
+		仕訳.Val仕訳詳細 = newVal仕訳詳細(計上年月, コストプール, 按分ルール1, 按分ルール2)
 		仕訳一覧 = append(仕訳一覧, &仕訳)
 	}
 
@@ -445,3 +632,15 @@ func (r *repo仕訳) FindAll() ([]*domain.Ent仕訳, error) {
 
 // domain.Repo仕訳インターフェースを実装していることを保証
 var _ domain.Repo仕訳 = (*repo仕訳)(nil)
+
+func newVal仕訳詳細(計上年月, コストプール, 按分ルール1, 按分ルール2 sql.NullString) *domain.Val仕訳詳細 {
+	if !計上年月.Valid {
+		return nil
+	}
+	return &domain.Val仕訳詳細{
+		Fld計上年月:   計上年月.String,
+		Fldコストプール: コストプール.String,
+		Fld按分ルール1: 按分ルール1.String,
+		Fld按分ルール2: 按分ルール2.String,
+	}
+}

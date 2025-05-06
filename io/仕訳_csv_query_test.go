@@ -14,7 +14,7 @@ func TestQuery仕訳Read_正常系(t *testing.T) {
 1,2024-05-01,1001,現金,現金,SC1,SC2,1234,課税,100,外税,10,無,TC1,取引先A,TSC1,TSC2,品目A,PSC1,PSC2,補助A,HSC1,HSC2,部門A,BSC1,BSC2,メモA,MSC1,MSC2,セグ1,SSC1,SSC2,セグ2,SSC3,SSC4,セグ3,SSC5,SSC6,備考A,売上,売上,LSC1,LSC2,4321,課税,200,外税,8,無,TC2,取引先B,TSC3,TSC4,品目B,PSC3,PSC4,補助B,HSC3,HSC4,部門B,BSC3,BSC4,メモB,MSC3,MSC4,セグ4,SSC7,SSC8,セグ5,SSC9,SSC10,セグ6,SSC11,SSC12,備考B,決算,発行元A,2024-05-02,2024-05-03,承認,申請者A,2024-05-04,承認者A,2024-05-05,作成者A,税込,TRX1,ACC1,伝票1,仕訳1,1,フラグ,2024-05-10,1,2,3,内容A,方法A,精算1,依頼1`
 
 	r := csv.NewReader(strings.NewReader(csvData))
-	q := NewQuery仕訳(r)
+	q := NewQuery仕訳Csv(r)
 	records, err := q.Read()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -36,7 +36,7 @@ func TestQuery仕訳Read_異常系(t *testing.T) {
 1,2024-05-01,1001,現金,現金,SC1,SC2,NGVAL,課税,100,外税,10,無,TC1,取引先A,TSC1,TSC2,品目A,PSC1,PSC2,補助A,HSC1,HSC2,部門A,BSC1,BSC2,メモA,MSC1,MSC2,セグ1,SSC1,SSC2,セグ2,SSC3,SSC4,セグ3,SSC5,SSC6,備考A,売上,売上,LSC1,LSC2,4321,課税,200,外税,8,無,TC2,取引先B,TSC3,TSC4,品目B,PSC3,PSC4,補助B,HSC3,HSC4,部門B,BSC3,BSC4,メモB,MSC3,MSC4,セグ4,SSC7,SSC8,セグ5,SSC9,SSC10,セグ6,SSC11,SSC12,備考B,決算,発行元A,2024-05-02,2024-05-03,承認,申請者A,2024-05-04,承認者A,2024-05-05,作成者A,税込,TRX1,ACC1,伝票1,仕訳1,1,フラグ,2024-05-10,1,2,3,内容A,方法A,精算1,依頼1`
 
 	r := csv.NewReader(strings.NewReader(csvData))
-	q := NewQuery仕訳(r)
+	q := NewQuery仕訳Csv(r)
 	_, err := q.Read()
 	if err == nil {
 		t.Fatal("want error, got nil")

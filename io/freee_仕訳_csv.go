@@ -2,13 +2,14 @@ package io
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/shopspring/decimal"
 )
 
 // csvFreee仕訳 は仕訳データCSVの行を表す構造体です
 type csvFreee仕訳 struct {
-	FldNo               string
+	FldNo               int64
 	Fld取引日              string
 	Fld管理番号             string
 	Fld借方勘定科目           string
@@ -111,6 +112,10 @@ type csvFreee仕訳 struct {
 }
 
 func NewCsvFreee仕訳(row []string) (*csvFreee仕訳, error) {
+	No, err := strconv.ParseInt(row[0], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("番号が整数以外です。値=%s", row[0])
+	}
 	借方金額, err := convertToDecimal(row[7])
 	if err != nil {
 		return nil, fmt.Errorf("借方金額が整数以外です。値=%s", row[7])
@@ -137,7 +142,7 @@ func NewCsvFreee仕訳(row []string) (*csvFreee仕訳, error) {
 	}
 
 	ret := csvFreee仕訳{
-		FldNo:       row[0],
+		FldNo:       No,
 		Fld取引日:      row[1],
 		Fld管理番号:     row[2],
 		Fld借方勘定科目:   row[3],
