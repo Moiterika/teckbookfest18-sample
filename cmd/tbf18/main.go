@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/xuri/excelize/v2"
@@ -13,10 +12,20 @@ import (
 )
 
 func main() {
+	exitCode := 0
+	defer func() {
+		if exitCode != 0 {
+			fmt.Println("異常終了しました。")
+		}
+		os.Exit(exitCode)
+	}()
+
 	// CSVファイルを開く
 	csvFile, err := os.Open("./sample_data.csv")
 	if err != nil {
-		log.Fatalf("CSVファイルを開けませんでした: %v", err)
+		fmt.Printf("CSVファイルを開けませんでした: %v", err)
+		exitCode = 1
+		return
 	}
 	defer csvFile.Close()
 
@@ -28,10 +37,12 @@ func main() {
 	// CSV仕訳リーダーインスタンスを作成
 	csvReader := io.New仕訳CsvReader(reader)
 
-	// Excelファイルを開く
-	xlsxFile, err := excelize.OpenFile("./template.xlsx") // テンプレートファイルのパスを適切に設定してください
+	// xlsxファイルを開く
+	xlsxFile, err := excelize.OpenFile("./按分サンプル.xlsx") // xlsxファイルのパスを適切に設定してください
 	if err != nil {
-		log.Fatalf("Excelファイルを開けませんでした: %v", err)
+		fmt.Printf("xlsxファイルを開けませんでした: %v", err)
+		exitCode = 1
+		return
 	}
 	defer xlsxFile.Close()
 
@@ -42,10 +53,16 @@ func main() {
 	service := domain.NewService仕訳(csvReader, xlsxIo)
 
 	// Service仕訳を実行
-	err = service.Execute()
-	if err != nil {
-		log.Fatalf("仕訳処理エラー: %v", err)
+	仕訳一覧, err := service.Query()
+	if err != nil && err != domain.Error未定義仕訳 {
+		fmt.Printf("仕訳処理エラー: %v", err)
+		exitCode = 1
+		return
+	} else if err == domain.Error未定義仕訳 {
+		xlsxIo.Save(仕訳一覧)
+		exitCode = 2
+		return
 	}
+	xlsxIo.Save(仕訳一覧)
 
-	fmt.Println("仕訳データの処理が完了しました！")
 }

@@ -119,8 +119,8 @@ func (e *Ent仕訳) GetVal仕訳詳細From(other *Ent仕訳) *Val仕訳詳細 {
 	return other.Val仕訳詳細
 }
 
-func (e *Ent仕訳) Key() 仕訳Key {
-	return 仕訳Key{
+func (e *Ent仕訳) Key() key仕訳 {
+	return key仕訳{
 		Fld仕訳ID:  e.Fld仕訳ID,
 		Fld仕訳行番号: e.Fld仕訳行番号,
 	}

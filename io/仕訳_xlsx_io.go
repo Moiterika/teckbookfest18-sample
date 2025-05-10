@@ -25,7 +25,7 @@ func (x *仕訳XlsxIo) Read勘定科目一覧() ([]*domain.Ent勘定科目, erro
 	if err != nil {
 		return make([]*domain.Ent勘定科目, 0), err
 	}
-	ret := make([]*domain.Ent勘定科目, 0, len(rows)-1)
+	ret := make([]*domain.Ent勘定科目, 0, len(rows))
 	for i, row := range rows {
 		if i == 0 {
 			// ヘッダーを読み飛ばし
@@ -33,9 +33,8 @@ func (x *仕訳XlsxIo) Read勘定科目一覧() ([]*domain.Ent勘定科目, erro
 		}
 		var e domain.Ent勘定科目
 		e.Fld勘定科目 = getStringCell(row, 0)
-		e.Fld勘定科目 = getStringCell(row, 1)
-		e.Fld基本ルール = domain.New基本ルール(getStringCell(row, 2))
-		e.Fldコストプール = getStringCell(row, 3)
+		e.Fld基本ルール = domain.New基本ルール(getStringCell(row, 1))
+		e.Fldコストプール = getStringCell(row, 2)
 		ret = append(ret, &e)
 	}
 	return ret, nil
@@ -47,7 +46,7 @@ func (x *仕訳XlsxIo) Read仕訳一覧() ([]*domain.Ent仕訳, error) {
 	if err != nil {
 		return make([]*domain.Ent仕訳, 0), err
 	}
-	ret := make([]*domain.Ent仕訳, 0, len(rows)-1)
+	ret := make([]*domain.Ent仕訳, 0, len(rows))
 	for i, row := range rows {
 		if i == 0 {
 			// ヘッダーを読み飛ばし
@@ -197,5 +196,9 @@ func (x *仕訳XlsxIo) Read仕訳一覧() ([]*domain.Ent仕訳, error) {
 // Save は仕訳データを保存します
 func (x *仕訳XlsxIo) Save(data []*domain.Ent仕訳) error {
 	// TODO: 実装
+	for _, row := range data {
+		fmt.Printf("%+v\n", row)
+		fmt.Printf("%+v\n", *row.Val仕訳詳細)
+	}
 	return nil
 }

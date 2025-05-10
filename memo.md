@@ -44,6 +44,9 @@ Copilot Agentとのやり取りを記録します
 
 ### 完了
 
-（完了したタスクをここに記載）
+- **OrderedMapのテスト実装**
+  - OrderedMap構造体の全メソッド（NewOrderedMap, Set, Get, Count, Keys, Values, Delete, Range）に対するテストケースを実装。
+  - 挿入順序の保持、キーの更新、削除、範囲走査など、すべての機能のテストを実装。
+  - テストカバレッジは100%達成。
 
 
