@@ -50,7 +50,9 @@ func (x *按分ルールXlsxIo) Save(按分ルール一覧 []*domain.Ent按分�
 	// シートの有無チェックと既存行取得
 	var sheetIdx int
 	var existingRowsCount int
-	if idx, err := x.ef.GetSheetIndex(sheet按分ルール一覧); err == nil {
+	if idx, err := x.ef.GetSheetIndex(sheet按分ルール一覧); err != nil {
+		return err
+	} else if idx != -1 {
 		sheetIdx = idx
 		existingRows, _ := x.ef.GetRows(sheet按分ルール一覧)
 		existingRowsCount = len(existingRows)

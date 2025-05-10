@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func TestProportionalAllocate(t *testing.T) {
+func TestCalc按分(t *testing.T) {
 	type testItem struct {
 		Name   string
 		Weight decimal.Decimal
@@ -121,7 +121,7 @@ func TestProportionalAllocate(t *testing.T) {
 				return e.Weight
 			}
 
-			results, err := ProportionalAllocate(
+			results, err := Calc按分(
 				tc.total,
 				tc.items,
 				getWeight,
@@ -208,7 +208,7 @@ func TestProportionalAllocateErrors(t *testing.T) {
 			switch items := tc.items.(type) {
 			case []struct{}:
 				getWeight := tc.getWeight.(func(struct{}) decimal.Decimal)
-				_, err := ProportionalAllocate(tc.total, items, getWeight)
+				_, err := Calc按分(tc.total, items, getWeight)
 				if err == nil {
 					t.Fatal("expected an error, got none")
 				}
@@ -223,7 +223,7 @@ func TestProportionalAllocateErrors(t *testing.T) {
 					Name   string
 					Weight decimal.Decimal
 				}) decimal.Decimal)
-				_, err := ProportionalAllocate(tc.total, items, getWeight)
+				_, err := Calc按分(tc.total, items, getWeight)
 				if err == nil {
 					t.Fatal("expected an error, got none")
 				}

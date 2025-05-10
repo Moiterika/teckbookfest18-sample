@@ -54,7 +54,9 @@ func WithRoundingMode(mode roundingMode) OptionFunc {
 	}
 }
 
-func ProportionalAllocate[T any](
+// Calc按分 は按分計算の関数です。
+// func ProportionalAllocate[T any](
+func Calc按分[T any](
 	total decimal.Decimal,
 	items []T,
 	getWeight func(e T) decimal.Decimal,

@@ -198,7 +198,9 @@ func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
 	// シートの有無チェックと既存行取得
 	var sheetIdx int
 	var existingRowsCount int
-	if idx, err := x.ef.GetSheetIndex(sheet仕訳一覧); err == nil {
+	if idx, err := x.ef.GetSheetIndex(sheet仕訳一覧); err != nil {
+		return err
+	} else if idx != -1 {
 		sheetIdx = idx
 		existingRows, _ := x.ef.GetRows(sheet仕訳一覧)
 		existingRowsCount = len(existingRows)
