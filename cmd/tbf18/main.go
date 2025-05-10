@@ -1,40 +1,30 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/xuri/excelize/v2"
 
+	"teckbookfest18-sample/domain"
 	"teckbookfest18-sample/io"
 )
 
 func main() {
-	// SQLite3データベースを開く（存在しない場合は作成）
-	db, err := sql.Open("sqlite3", "./test.db")
-	if err != nil {
-		log.Fatalf("データベースを開けませんでした: %v", err)
-	}
-	defer db.Close()
+	exitCode := 0
+	defer func() {
+		if exitCode != 0 {
+			fmt.Println("異常終了しました。")
+		}
+		os.Exit(exitCode)
+	}()
 
-	// SQLite仕訳Repoインスタンスを作成
-	repo := io.NewSQLite仕訳Repo(db)
-
-	// 仕訳テーブルを作成
-	err = repo.CreateTableIfNotExists()
-	if err != nil {
-		log.Fatalf("仕訳テーブル作成エラー: %v", err)
-	}
-
-	// CSVファイルを開く - 実際のCSVファイルパスに置き換えてください
-	// 注意: この例ではサンプルのCSVファイルがあることを前提としています
+	// CSVファイルを開く
 	csvFile, err := os.Open("./sample_data.csv")
 	if err != nil {
-		log.Printf("CSVファイルを開けませんでした: %v", err)
-		fmt.Println("SQLite3データベースに接続しました！")
+		fmt.Printf("CSVファイルを開けませんでした: %v", err)
+		exitCode = 1
 		return
 	}
 	defer csvFile.Close()
@@ -44,30 +34,35 @@ func main() {
 	reader.LazyQuotes = true // 引用符の処理を緩和
 	reader.Comma = ','       // 区切り文字を指定
 
-	// Query仕訳インスタンスを作成
-	query := io.NewQuery仕訳(reader)
+	// CSV仕訳リーダーインスタンスを作成
+	csvReader := io.New仕訳CsvReader(reader)
 
-	// CSVデータを読み取る
-	仕訳一覧, err := query.Read()
+	// xlsxファイルを開く
+	xlsxFile, err := excelize.OpenFile("./按分サンプル.xlsx") // xlsxファイルのパスを適切に設定してください
 	if err != nil {
-		log.Printf("CSVデータの読み取りエラー: %v", err)
-		fmt.Println("SQLite3データベースに接続しました！")
+		fmt.Printf("xlsxファイルを開けませんでした: %v", err)
+		exitCode = 1
 		return
 	}
+	defer xlsxFile.Close()
 
-	// 読み取ったデータをデータベースに保存
-	err = repo.Save(仕訳一覧)
-	if err != nil {
-		log.Fatalf("データベース保存エラー: %v", err)
+	// XLSX仕訳IOインスタンスを作成
+	xlsxIo := io.New仕訳XlsxIo(xlsxFile)
+
+	// Service仕訳インスタンスを作成
+	service := domain.NewService仕訳(csvReader, xlsxIo)
+
+	// Service仕訳を実行
+	仕訳一覧, err := service.Query()
+	if err != nil && err != domain.Error未定義仕訳 {
+		fmt.Printf("仕訳処理エラー: %v", err)
+		exitCode = 1
+		return
+	} else if err == domain.Error未定義仕訳 {
+		xlsxIo.Save(仕訳一覧)
+		exitCode = 2
+		return
 	}
+	xlsxIo.Save(仕訳一覧)
 
-	fmt.Printf("SQLite3データベースに接続し、%d件の仕訳データを保存しました！\n", len(仕訳一覧))
-
-	// 保存したデータの取得テスト
-	savedData, err := repo.FindAll()
-	if err != nil {
-		log.Printf("データ取得エラー: %v", err)
-	} else {
-		fmt.Printf("データベースから%d件の仕訳データを取得しました。\n", len(savedData))
-	}
 }

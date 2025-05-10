@@ -6,20 +6,20 @@ import (
 	"teckbookfest18-sample/domain"
 )
 
-// query仕訳 はQuery仕訳インターフェースの実装です
-type query仕訳 struct {
+// 仕訳CsvReader はI仕訳CsvReaderインターフェースの実装です
+type 仕訳CsvReader struct {
 	reader *csv.Reader // CSVリーダーをプライベートフィールドとして保持
 }
 
-// NewQuery仕訳 はQuery仕訳の新しいインスタンスを作成します
-func NewQuery仕訳(reader *csv.Reader) domain.Query仕訳 {
-	return &query仕訳{
+// New仕訳CsvReader は仕訳CsvReaderの新しいインスタンスを作成します
+func New仕訳CsvReader(reader *csv.Reader) domain.I仕訳CsvReader {
+	return &仕訳CsvReader{
 		reader: reader,
 	}
 }
 
-// Read は初期化時に設定されたCSVリーダーから仕訳データを読み取ります
-func (q *query仕訳) Read() ([]*domain.Ent仕訳, error) {
+// ReadAll は初期化時に設定されたCSVリーダーから仕訳データを読み取ります
+func (q *仕訳CsvReader) ReadAll() ([]*domain.Ent仕訳, error) {
 	// CSVリーダーの設定
 	q.reader.Comma = ','
 	// r.FieldsPerRecord = -1

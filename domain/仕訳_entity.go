@@ -6,7 +6,7 @@ import (
 
 // Ent仕訳 は仕訳データの1行を表す構造体です
 type Ent仕訳 struct {
-	FldNo               string
+	FldNo               int64
 	Fld取引日              string
 	Fld管理番号             string
 	Fld借方勘定科目           string
@@ -106,4 +106,22 @@ type Ent仕訳 struct {
 	Fld登録した方法           string
 	Fld経費精算申請番号         string
 	Fld支払依頼申請番号         string
+	// ここから追加項目
+	*Val仕訳詳細
+}
+
+// GetVal仕訳詳細From は引数に指定された仕訳から有効な詳細情報を取得します
+func (e *Ent仕訳) GetVal仕訳詳細From(other *Ent仕訳) *Val仕訳詳細 {
+	// 勘定科目が以前と異なる場合、無効なので取得しない
+	if e.Fld借方勘定科目 != other.Fld借方勘定科目 {
+		return nil
+	}
+	return other.Val仕訳詳細
+}
+
+func (e *Ent仕訳) Key() key仕訳 {
+	return key仕訳{
+		Fld仕訳ID:  e.Fld仕訳ID,
+		Fld仕訳行番号: e.Fld仕訳行番号,
+	}
 }
