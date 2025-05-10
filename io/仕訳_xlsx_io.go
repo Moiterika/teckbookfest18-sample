@@ -194,11 +194,42 @@ func (x *仕訳XlsxIo) Read仕訳一覧() ([]*domain.Ent仕訳, error) {
 }
 
 // Save は仕訳データを保存します
-func (x *仕訳XlsxIo) Save(data []*domain.Ent仕訳) error {
-	// TODO: 実装
-	for _, row := range data {
-		fmt.Printf("%+v\n", row)
-		fmt.Printf("%+v\n", *row.Val仕訳詳細)
+func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
+	// シートの有無チェックと既存行取得
+	var sheetIdx int
+	var existingRowsCount int
+	if idx, err := x.ef.GetSheetIndex(sheet仕訳一覧); err == nil {
+		sheetIdx = idx
+		existingRows, _ := x.ef.GetRows(sheet仕訳一覧)
+		existingRowsCount = len(existingRows)
+	} else {
+		var err error
+		sheetIdx, err = x.ef.NewSheet(sheet仕訳一覧)
+		if err != nil {
+			return err
+		}
 	}
+	// ヘッダー行を書き込み
+	headers := []interface{}{"計上年月", "コストプール", "按分ルール1", "按分ルール2"}
+	x.ef.SetSheetRow(sheet仕訳一覧, "A1", &headers)
+	// データ行を書き込み
+	for i, e := range 仕訳一覧 {
+		d := e.Val仕訳詳細
+		row := []interface{}{d.Fld計上年月, d.Fldコストプール, d.Fld按分ルール1, d.Fld按分ルール2}
+		cell := fmt.Sprintf("A%d", i+2)
+		x.ef.SetSheetRow(sheet仕訳一覧, cell, &row)
+	}
+	// 余分な行を削除（データ数が減った場合）
+	if existingRowsCount > len(仕訳一覧)+1 {
+		targetRow := len(仕訳一覧) + 2
+		count := existingRowsCount - (len(仕訳一覧) + 1)
+		for i := 0; i < count; i++ {
+			if err := x.ef.RemoveRow(sheet仕訳一覧, targetRow); err != nil {
+				return err
+			}
+		}
+	}
+	// シートをアクティブに設定
+	x.ef.SetActiveSheet(sheetIdx)
 	return nil
 }

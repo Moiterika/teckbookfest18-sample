@@ -37,11 +37,11 @@ func (w *集約仕訳XlsxWriter) Save(集約仕訳一覧 []*domain.Ent集計仕�
 		}
 	}
 	// ヘッダー行を書き込み
-	headers := []interface{}{"計上年月", "コストプール", "按分ルール1", "按分ルール2", "借方税区分", "借方税率", "合計金額"}
+	headers := []interface{}{"計上年月", "勘定科目", "コストプール", "按分ルール1", "按分ルール2", "借方税区分", "借方税率", "合計金額"}
 	w.ef.SetSheetRow(sheet集約仕訳一覧, "A1", &headers)
 	// データ行を書き込み
 	for i, e := range 集約仕訳一覧 {
-		row := []interface{}{e.Fld計上年月, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, e.Fld借方税区分, e.Fld借方税率.String(), e.Fld合計金額.String()}
+		row := []interface{}{e.Fld計上年月, e.Fld勘定科目, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, e.Fld借方税区分, e.Fld借方税率.String(), e.Fld合計金額.String()}
 		cell := fmt.Sprintf("A%d", i+2)
 		w.ef.SetSheetRow(sheet集約仕訳一覧, cell, &row)
 	}
