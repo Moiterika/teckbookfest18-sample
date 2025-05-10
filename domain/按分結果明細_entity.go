@@ -2,7 +2,7 @@ package domain
 
 import "github.com/shopspring/decimal"
 
-type Ent集計仕訳 struct {
+type Ent按分結果明細 struct {
 	Fld計上年月   string
 	Fld勘定科目   string
 	Fldコストプール string
@@ -11,4 +11,8 @@ type Ent集計仕訳 struct {
 	Fld借方税区分  string
 	Fld借方税率   decimal.Decimal
 	Fld合計金額   decimal.Decimal
+	Fld按分先    string
+	Fld按分基準値  decimal.Decimal
+	Fld按分誤差   decimal.Decimal // 按分結果に含まれている誤差
+	Fld按分結果   decimal.Decimal
 }

@@ -18,7 +18,7 @@ func newVal仕訳詳細FromDb(計上年月, コストプール, 按分ルール1
 }
 
 func newVal仕訳詳細(計上年月, コストプール, 按分ルール1, 按分ルール2 string) *domain.Val仕訳詳細 {
-	if 計上年月 != "" {
+	if 計上年月 == "" {
 		return nil
 	}
 	return &domain.Val仕訳詳細{
