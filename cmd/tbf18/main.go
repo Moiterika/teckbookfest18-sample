@@ -23,7 +23,7 @@ func main() {
 	// CSVファイルを開く
 	csvFile, err := os.Open("./sample_data.csv")
 	if err != nil {
-		fmt.Printf("CSVファイルを開けませんでした: %v", err)
+		fmt.Printf("CSVファイルを開けませんでした: %v\n", err)
 		exitCode = 1
 		return
 	}
@@ -40,42 +40,69 @@ func main() {
 	// xlsxファイルを開く
 	xlsxFile, err := excelize.OpenFile("./按分サンプル.xlsx") // xlsxファイルのパスを適切に設定してください
 	if err != nil {
-		fmt.Printf("xlsxファイルを開けませんでした: %v", err)
+		fmt.Printf("xlsxファイルを開けませんでした: %v\n", err)
 		exitCode = 1
 		return
 	}
 	defer xlsxFile.Close()
 
 	// XLSX仕訳IOインスタンスを作成
-	xlsx仕訳一覧 := io.New仕訳XlsxIo(xlsxFile)
+	仕訳一覧xlsx := io.New仕訳XlsxIo(xlsxFile)
 
 	// Service仕訳インスタンスを作成
-	service := domain.NewService仕訳(csvReader, xlsx仕訳一覧)
+	仕訳サービス := domain.NewService仕訳(csvReader, 仕訳一覧xlsx)
 
 	// Service仕訳を実行
-	仕訳一覧, err := service.Query仕訳一覧()
+	仕訳一覧, err := 仕訳サービス.Query仕訳一覧()
 	if err != nil && err != domain.Error未定義仕訳 {
-		fmt.Printf("仕訳処理エラー: %v", err)
+		fmt.Printf("仕訳処理エラー: %v\n", err)
 		exitCode = 1
 		return
 	} else if err == domain.Error未定義仕訳 {
-		xlsx仕訳一覧.Save(仕訳一覧)
+		仕訳一覧xlsx.Save(仕訳一覧)
 		exitCode = 2
 		return
 	}
-	xlsx仕訳一覧.Save(仕訳一覧)
-
-	集計仕訳一覧, err := service.Query集計仕訳(仕訳一覧)
+	err = 仕訳一覧xlsx.Save(仕訳一覧)
 	if err != nil {
+		fmt.Printf("仕訳データの保存エラー: %v\n", err)
 		exitCode = 2
 		return
 	}
 
-	xlsx集計仕訳一覧 := io.New集計仕訳XlsxWriter(xlsxFile)
-	err = xlsx集計仕訳一覧.Save(集計仕訳一覧.Get())
+	集計仕訳一覧, err := 仕訳サービス.Query集計仕訳(仕訳一覧)
 	if err != nil {
+		fmt.Printf("集計仕訳処理エラー: %v\n", err)
 		exitCode = 2
 		return
 	}
 
+	集計仕訳一覧xlsx := io.New集計仕訳XlsxWriter(xlsxFile)
+	err = 集計仕訳一覧xlsx.Save(集計仕訳一覧.Get())
+	if err != nil {
+		fmt.Printf("集計仕訳データの保存エラー: %v\n", err)
+		exitCode = 2
+		return
+	}
+
+	// XLSX仕訳IOインスタンスを作成
+	按分ルール一覧xlsx := io.New按分ルールXlsxIo(xlsxFile)
+
+	// Service経費配賦インスタンスを作成
+	経費配賦サービス := domain.NewService経費配賦(按分ルール一覧xlsx)
+	按分ルール一覧, err := 経費配賦サービス.Query按分ルール一覧()
+	if err != nil {
+		fmt.Printf("按分ルール処理エラー: %v\n", err)
+		exitCode = 2
+		return
+	}
+	按分結果明細一覧, err := 経費配賦サービス.Execute配賦(集計仕訳一覧.Get(), 按分ルール一覧)
+	if err != nil {
+		fmt.Printf("按分ルール処理エラー: %v\n", err)
+		exitCode = 2
+		return
+	}
+	for _, e := range 按分結果明細一覧 {
+		fmt.Printf("%+v\n", e)
+	}
 }

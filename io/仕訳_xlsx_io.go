@@ -244,12 +244,19 @@ func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
 
 	// データ行を書き込み
 	for i, e := range 仕訳一覧 {
-		d := e.Val仕訳詳細
+		// Val仕訳詳細がnilの場合は初期値で埋める
+		var d *domain.Val仕訳詳細
+		if e.Val仕訳詳細 == nil {
+			// 日本語コメント: Val仕訳詳細がnilの場合は空の構造体で初期化
+			d = &domain.Val仕訳詳細{}
+		} else {
+			d = e.Val仕訳詳細
+		}
 		row := []interface{}{
 			d.Fld計上年月, d.Fldコストプール, d.Fld按分ルール1, d.Fld按分ルール2,
 			e.FldNo, e.Fld取引日, e.Fld管理番号,
 			e.Fld借方勘定科目, e.Fld借方決算書表示名, e.Fld借方勘定科目ショートカット1, e.Fld借方勘定科目ショートカット2,
-			e.Fld借方金額, e.Fld借方税区分, e.Fld借方税金額, e.Fld借方内税外税, e.Fld借方税率, e.Fld借方軽減税率有無,
+			e.Fld借方金額.IntPart(), e.Fld借方税区分, e.Fld借方税金額.IntPart(), e.Fld借方内税外税, e.Fld借方税率, e.Fld借方軽減税率有無,
 			e.Fld借方取引先コード, e.Fld借方取引先名, e.Fld借方取引先ショートカット1, e.Fld借方取引先ショートカット2,
 			e.Fld借方品目, e.Fld借方品目ショートカット1, e.Fld借方品目ショートカット2,
 			e.Fld借方補助科目名, e.Fld借方補助科目ショートカット1, e.Fld借方補助科目ショートカット2,
@@ -260,7 +267,7 @@ func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
 			e.Fld借方セグメント3, e.Fld借方セグメント3ショートカット1, e.Fld借方セグメント3ショートカット2,
 			e.Fld借方備考,
 			e.Fld貸方勘定科目, e.Fld貸方決算書表示名, e.Fld貸方勘定科目ショートカット1, e.Fld貸方勘定科目ショートカット2,
-			e.Fld貸方金額, e.Fld貸方税区分, e.Fld貸方税金額, e.Fld貸方内税外税, e.Fld貸方税率, e.Fld貸方軽減税率有無,
+			e.Fld貸方金額.IntPart(), e.Fld貸方税区分, e.Fld貸方税金額.IntPart(), e.Fld貸方内税外税, e.Fld貸方税率, e.Fld貸方軽減税率有無,
 			e.Fld貸方取引先コード, e.Fld貸方取引先名, e.Fld貸方取引先ショートカット1, e.Fld貸方取引先ショートカット2,
 			e.Fld貸方品目, e.Fld貸方品目ショートカット1, e.Fld貸方品目ショートカット2,
 			e.Fld貸方補助科目名, e.Fld貸方補助科目ショートカット1, e.Fld貸方補助科目ショートカット2,

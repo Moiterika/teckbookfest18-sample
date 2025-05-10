@@ -78,8 +78,8 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 		if x, ok := xlsxDic[csvRow.Key()]; ok {
 			csvRow.Val仕訳詳細 = csvRow.GetVal仕訳詳細From(x) // xlsxにある仕訳詳細を取得してマージ
 			// 取引日変更で計上年月が違っている場合、警告
-			if csvRow.Val仕訳詳細 != nil && csvRow.Fld計上年月 != 計上年月 {
-				fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+1, 計上年月, csvRow.Fld取引日)
+			if csvRow.Val仕訳詳細 != nil && csvRow.Fld計上年月 != "" && csvRow.Fld計上年月 != 計上年月 {
+				fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+1, csvRow.Fld計上年月, csvRow.Fld取引日)
 			}
 			continue
 		}
