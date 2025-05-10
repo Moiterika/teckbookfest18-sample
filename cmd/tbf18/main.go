@@ -1,41 +1,22 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/csv"
 	"fmt"
 	"log"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/xuri/excelize/v2"
 
+	"teckbookfest18-sample/domain"
 	"teckbookfest18-sample/io"
 )
 
 func main() {
-	// SQLite3データベースを開く（存在しない場合は作成）
-	db, err := sql.Open("sqlite3", "./test.db")
-	if err != nil {
-		log.Fatalf("データベースを開けませんでした: %v", err)
-	}
-	defer db.Close()
-
-	// SQLite仕訳Repoインスタンスを作成
-	repo := io.NewSQLite仕訳Repo(db)
-
-	// 仕訳テーブルを作成
-	err = repo.CreateTableIfNotExists()
-	if err != nil {
-		log.Fatalf("仕訳テーブル群作成エラー: %v", err)
-	}
-
-	// CSVファイルを開く - 実際のCSVファイルパスに置き換えてください
-	// 注意: この例ではサンプルのCSVファイルがあることを前提としています
+	// CSVファイルを開く
 	csvFile, err := os.Open("./sample_data.csv")
 	if err != nil {
-		log.Printf("CSVファイルを開けませんでした: %v", err)
-		fmt.Println("SQLite3データベースに接続しました！")
-		return
+		log.Fatalf("CSVファイルを開けませんでした: %v", err)
 	}
 	defer csvFile.Close()
 
@@ -44,30 +25,27 @@ func main() {
 	reader.LazyQuotes = true // 引用符の処理を緩和
 	reader.Comma = ','       // 区切り文字を指定
 
-	// Query仕訳インスタンスを作成
-	query := io.NewQuery仕訳Csv(reader)
+	// CSV仕訳リーダーインスタンスを作成
+	csvReader := io.New仕訳CsvReader(reader)
 
-	// CSVデータを読み取る
-	仕訳一覧, err := query.Read()
+	// Excelファイルを開く
+	xlsxFile, err := excelize.OpenFile("./template.xlsx") // テンプレートファイルのパスを適切に設定してください
 	if err != nil {
-		log.Printf("CSVデータの読み取りエラー: %v", err)
-		fmt.Println("SQLite3データベースに接続しました！")
-		return
+		log.Fatalf("Excelファイルを開けませんでした: %v", err)
+	}
+	defer xlsxFile.Close()
+
+	// XLSX仕訳IOインスタンスを作成
+	xlsxIo := io.New仕訳XlsxIo(xlsxFile)
+
+	// Service仕訳インスタンスを作成
+	service := domain.NewService仕訳(csvReader, xlsxIo, nil)
+
+	// Service仕訳を実行
+	err = service.Execute()
+	if err != nil {
+		log.Fatalf("仕訳処理エラー: %v", err)
 	}
 
-	// 読み取ったデータをデータベースに保存
-	err = repo.Save(仕訳一覧)
-	if err != nil {
-		log.Fatalf("データベース保存エラー: %v", err)
-	}
-
-	fmt.Printf("SQLite3データベースに接続し、%d件の仕訳データを保存しました！\n", len(仕訳一覧))
-
-	// 保存したデータの取得テスト
-	savedData, err := repo.FindAll()
-	if err != nil {
-		log.Printf("データ取得エラー: %v", err)
-	} else {
-		fmt.Printf("データベースから%d件の仕訳データを取得しました。\n", len(savedData))
-	}
+	fmt.Println("仕訳データの処理が完了しました！")
 }

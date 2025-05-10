@@ -109,3 +109,19 @@ type Ent仕訳 struct {
 	// ここから追加項目
 	*Val仕訳詳細
 }
+
+// GetVal仕訳詳細From は引数に指定された仕訳から有効な詳細情報を取得します
+func (e *Ent仕訳) GetVal仕訳詳細From(other *Ent仕訳) *Val仕訳詳細 {
+	// 勘定科目が以前と異なる場合、無効なので取得しない
+	if e.Fld借方勘定科目 != other.Fld借方勘定科目 {
+		return nil
+	}
+	return other.Val仕訳詳細
+}
+
+func (e *Ent仕訳) Key() 仕訳Key {
+	return 仕訳Key{
+		Fld仕訳ID:  e.Fld仕訳ID,
+		Fld仕訳行番号: e.Fld仕訳行番号,
+	}
+}

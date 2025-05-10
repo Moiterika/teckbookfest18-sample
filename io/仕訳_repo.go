@@ -619,7 +619,7 @@ ORDER BY
 		仕訳.Fld貸方税金額 = decimal.NewFromInt(貸方税金額)
 		仕訳.Fld貸方税率 = decimal.NewFromInt(貸方税率)
 		// 仕訳詳細のフィールドをセット
-		仕訳.Val仕訳詳細 = newVal仕訳詳細(計上年月, コストプール, 按分ルール1, 按分ルール2)
+		仕訳.Val仕訳詳細 = newVal仕訳詳細FromDb(計上年月, コストプール, 按分ルール1, 按分ルール2)
 		仕訳一覧 = append(仕訳一覧, &仕訳)
 	}
 
@@ -628,19 +628,4 @@ ORDER BY
 	}
 
 	return 仕訳一覧, nil
-}
-
-// domain.Repo仕訳インターフェースを実装していることを保証
-var _ domain.Repo仕訳 = (*repo仕訳)(nil)
-
-func newVal仕訳詳細(計上年月, コストプール, 按分ルール1, 按分ルール2 sql.NullString) *domain.Val仕訳詳細 {
-	if !計上年月.Valid {
-		return nil
-	}
-	return &domain.Val仕訳詳細{
-		Fld計上年月:   計上年月.String,
-		Fldコストプール: コストプール.String,
-		Fld按分ルール1: 按分ルール1.String,
-		Fld按分ルール2: 按分ルール2.String,
-	}
 }
