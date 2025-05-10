@@ -22,7 +22,7 @@ func NewService仕訳(csv I仕訳CsvReader, xlsx I仕訳XlsxIo) *Service仕訳 {
 
 var Error未定義仕訳 = fmt.Errorf("按分ルールが未定義です")
 
-func (s *Service仕訳) Query() ([]*Ent仕訳, error) {
+func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 	// 1. CSVから仕訳データを読み取る
 	csvRows, err := s.csv.ReadAll()
 	if err != nil {
@@ -76,9 +76,11 @@ func (s *Service仕訳) Query() ([]*Ent仕訳, error) {
 		計上年月 := t.Format("200601") // YYYYMM
 
 		if x, ok := xlsxDic[csvRow.Key()]; ok {
-			csvRow.GetVal仕訳詳細From(x) // xlsxにある仕訳詳細を取得してマージ
-			// 取引日変更で計上年月が違っている場合があるので、その場合、警告
-			fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+1, 計上年月, csvRow.Fld取引日)
+			csvRow.Val仕訳詳細 = csvRow.GetVal仕訳詳細From(x) // xlsxにある仕訳詳細を取得してマージ
+			// 取引日変更で計上年月が違っている場合、警告
+			if csvRow.Val仕訳詳細 != nil && csvRow.Fld計上年月 != 計上年月 {
+				fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+1, 計上年月, csvRow.Fld取引日)
+			}
 			continue
 		}
 
@@ -110,4 +112,26 @@ func (s *Service仕訳) Query() ([]*Ent仕訳, error) {
 		return csvRows, Error未定義仕訳
 	}
 	return csvRows, nil
+}
+
+func (s *Service仕訳) Query集計仕訳(仕訳一覧 []*Ent仕訳) (List集計仕訳, error) {
+	// 1. 集計仕訳を作成
+	集計仕訳一覧 := NewList集計仕訳()
+	var hasErr bool
+	for _, e := range 仕訳一覧 {
+		key, err := newKey集計仕訳(e)
+		if err != nil {
+			hasErr = true
+			fmt.Printf("集計仕訳作成エラー: %v\n", err)
+			continue
+		}
+		if key.Fld按分ルール1 == "対象外" {
+			continue
+		}
+		集計仕訳一覧.Add(*key, e.Fld借方金額)
+	}
+	if hasErr {
+		return 集計仕訳一覧, fmt.Errorf("集計仕訳の作成に失敗しました。")
+	}
+	return 集計仕訳一覧, nil
 }

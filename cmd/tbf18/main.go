@@ -47,22 +47,35 @@ func main() {
 	defer xlsxFile.Close()
 
 	// XLSX仕訳IOインスタンスを作成
-	xlsxIo := io.New仕訳XlsxIo(xlsxFile)
+	xlsx仕訳一覧 := io.New仕訳XlsxIo(xlsxFile)
 
 	// Service仕訳インスタンスを作成
-	service := domain.NewService仕訳(csvReader, xlsxIo)
+	service := domain.NewService仕訳(csvReader, xlsx仕訳一覧)
 
 	// Service仕訳を実行
-	仕訳一覧, err := service.Query()
+	仕訳一覧, err := service.Query仕訳一覧()
 	if err != nil && err != domain.Error未定義仕訳 {
 		fmt.Printf("仕訳処理エラー: %v", err)
 		exitCode = 1
 		return
 	} else if err == domain.Error未定義仕訳 {
-		xlsxIo.Save(仕訳一覧)
+		xlsx仕訳一覧.Save(仕訳一覧)
 		exitCode = 2
 		return
 	}
-	xlsxIo.Save(仕訳一覧)
+	xlsx仕訳一覧.Save(仕訳一覧)
+
+	集計仕訳一覧, err := service.Query集計仕訳(仕訳一覧)
+	if err != nil {
+		exitCode = 2
+		return
+	}
+
+	xlsx集計仕訳一覧 := io.New集計仕訳XlsxWriter(xlsxFile)
+	err = xlsx集計仕訳一覧.Save(集計仕訳一覧.Get())
+	if err != nil {
+		exitCode = 2
+		return
+	}
 
 }
