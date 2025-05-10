@@ -10,15 +10,13 @@ import (
 type Service仕訳 struct {
 	csv  I仕訳CsvReader
 	xlsx I仕訳XlsxIo
-	repo I仕訳Repo
 }
 
 // NewService仕訳 は Service仕訳 のインスタンスを作成します
-func NewService仕訳(csv I仕訳CsvReader, xlsx I仕訳XlsxIo, repo I仕訳Repo) *Service仕訳 {
+func NewService仕訳(csv I仕訳CsvReader, xlsx I仕訳XlsxIo) *Service仕訳 {
 	return &Service仕訳{
 		csv:  csv,
 		xlsx: xlsx,
-		repo: repo,
 	}
 }
 
@@ -89,11 +87,6 @@ func (s *Service仕訳) Execute() error {
 				Fld按分ルール2: 按分ルール2,
 			}
 		}
-	}
-
-	// 3. 仕訳データをデータベースに保存する
-	if err := s.repo.Save(csvRows); err != nil {
-		return err
 	}
 
 	return nil

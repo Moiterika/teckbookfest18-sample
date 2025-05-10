@@ -39,7 +39,7 @@ func main() {
 	xlsxIo := io.New仕訳XlsxIo(xlsxFile)
 
 	// Service仕訳インスタンスを作成
-	service := domain.NewService仕訳(csvReader, xlsxIo, nil)
+	service := domain.NewService仕訳(csvReader, xlsxIo)
 
 	// Service仕訳を実行
 	err = service.Execute()
