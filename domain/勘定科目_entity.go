@@ -13,6 +13,7 @@ const (
 
 type Ent勘定科目 struct {
 	Fld勘定科目   string
+	Fld原価要素   string
 	Fld基本ルール  Enum基本ルール
 	Fldコストプール string // コストプール（任意項目）
 }

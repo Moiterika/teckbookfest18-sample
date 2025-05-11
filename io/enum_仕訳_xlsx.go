@@ -2,6 +2,7 @@ package io
 
 const (
 	FldIdx計上年月 int = iota
+	FldIdx原価要素
 	FldIdxコストプール
 	FldIdx按分ルール1
 	FldIdx按分ルール2

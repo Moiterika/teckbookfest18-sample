@@ -34,7 +34,8 @@ func (x *仕訳XlsxIo) Read勘定科目一覧() ([]*domain.Ent勘定科目, erro
 		var e domain.Ent勘定科目
 		e.Fld勘定科目 = getStringCell(row, 0)
 		e.Fld基本ルール = domain.New基本ルール(getStringCell(row, 1))
-		e.Fldコストプール = getStringCell(row, 2)
+		e.Fld原価要素 = getStringCell(row, 2)
+		e.Fldコストプール = getStringCell(row, 3)
 		ret = append(ret, &e)
 	}
 	return ret, nil
@@ -87,7 +88,7 @@ func (x *仕訳XlsxIo) Read仕訳一覧() ([]*domain.Ent仕訳, error) {
 
 		var e domain.Ent仕訳
 		// 仕訳詳細のフィールドをセット
-		e.Val仕訳詳細 = newVal仕訳詳細(getStringCell(row, FldIdx計上年月), getStringCell(row, FldIdxコストプール), getStringCell(row, FldIdx按分ルール1), getStringCell(row, FldIdx按分ルール2))
+		e.Val仕訳詳細 = newVal仕訳詳細(getStringCell(row, FldIdx計上年月), getStringCell(row, FldIdx原価要素), getStringCell(row, FldIdxコストプール), getStringCell(row, FldIdx按分ルール1), getStringCell(row, FldIdx按分ルール2))
 		e.FldNo = no
 		e.Fld取引日 = getStringCell(row, FldIdx取引日)
 		e.Fld管理番号 = getStringCell(row, FldIdx管理番号)
@@ -213,7 +214,7 @@ func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
 	}
 	// ヘッダー行を書き込み
 	headers := []interface{}{
-		"計上年月", "コストプール", "按分ルール1", "按分ルール2", "No", "取引日", "管理番号",
+		"計上年月", "原価要素", "コストプール", "按分ルール1", "按分ルール2", "No", "取引日", "管理番号",
 		"借方勘定科目", "借方決算書表示名", "借方勘定科目ショートカット1", "借方勘定科目ショートカット2",
 		"借方金額", "借方税区分", "借方税金額", "借方内税外税", "借方税率", "借方軽減税率有無",
 		"借方取引先コード", "借方取引先名", "借方取引先ショートカット1", "借方取引先ショートカット2",
@@ -255,7 +256,7 @@ func (x *仕訳XlsxIo) Save(仕訳一覧 []*domain.Ent仕訳) error {
 			d = e.Val仕訳詳細
 		}
 		row := []interface{}{
-			d.Fld計上年月, d.Fldコストプール, d.Fld按分ルール1, d.Fld按分ルール2,
+			d.Fld計上年月, d.Fld原価要素, d.Fldコストプール, d.Fld按分ルール1, d.Fld按分ルール2,
 			e.FldNo, e.Fld取引日, e.Fld管理番号,
 			e.Fld借方勘定科目, e.Fld借方決算書表示名, e.Fld借方勘定科目ショートカット1, e.Fld借方勘定科目ショートカット2,
 			e.Fld借方金額.IntPart(), e.Fld借方税区分, e.Fld借方税金額.IntPart(), e.Fld借方内税外税, e.Fld借方税率, e.Fld借方軽減税率有無,

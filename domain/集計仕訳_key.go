@@ -8,7 +8,7 @@ import (
 
 type Key集計仕訳 struct {
 	Fld計上年月   string
-	Fld勘定科目   string
+	Fld原価要素   string
 	Fldコストプール string
 	Fld按分ルール1 string
 	Fld按分ルール2 string
@@ -21,6 +21,9 @@ func newKey集計仕訳(e *Ent仕訳) (*Key集計仕訳, error) {
 		return nil, fmt.Errorf("仕訳詳細が未定義です。")
 	}
 	if e.Val仕訳詳細.Fld按分ルール1 != "対象外" {
+		if e.Val仕訳詳細.Fld原価要素 == "" {
+			return nil, fmt.Errorf("原価要素が未定義です。")
+		}
 		if e.Val仕訳詳細.Fldコストプール == "" {
 			return nil, fmt.Errorf("コストプールが未定義です。")
 		}
@@ -30,7 +33,7 @@ func newKey集計仕訳(e *Ent仕訳) (*Key集計仕訳, error) {
 	}
 	return &Key集計仕訳{
 		Fld計上年月:   e.Val仕訳詳細.Fld計上年月,
-		Fld勘定科目:   e.Fld借方勘定科目,
+		Fld原価要素:   e.Fld原価要素,
 		Fldコストプール: e.Val仕訳詳細.Fldコストプール,
 		Fld按分ルール1: e.Val仕訳詳細.Fld按分ルール1,
 		Fld按分ルール2: e.Val仕訳詳細.Fld按分ルール2,

@@ -50,10 +50,11 @@ func (s *Service配賦) Execute配賦(集計仕訳一覧 []*Ent集計仕訳, 按
 			ret = append(ret, &Ent按分結果明細{
 				// 集計仕訳の情報をセット
 				Fld計上年月:   e.Fld計上年月,
-				Fld勘定科目:   e.Fld勘定科目,
+				Fld原価要素:   e.Fld勘定科目,
 				Fldコストプール: e.Fldコストプール,
 				Fld按分ルール1: e.Fld按分ルール1,
 				Fld按分ルール2: e.Fld按分ルール2,
+				FldIs直接費:  true,
 				Fld借方税区分:  e.Fld借方税区分,
 				Fld借方税率:   e.Fld借方税率,
 				Fld合計金額:   e.Fld合計金額,
@@ -84,10 +85,11 @@ func (s *Service配賦) Execute配賦(集計仕訳一覧 []*Ent集計仕訳, 按
 				ret = append(ret, &Ent按分結果明細{
 					// 集計仕訳の情報をセット
 					Fld計上年月:   e.Fld計上年月,
-					Fld勘定科目:   e.Fld勘定科目,
+					Fld原価要素:   e.Fld勘定科目,
 					Fldコストプール: e.Fldコストプール,
 					Fld按分ルール1: e.Fld按分ルール1,
 					Fld按分ルール2: e.Fld按分ルール2,
+					FldIs直接費:  false,
 					Fld借方税区分:  e.Fld借方税区分,
 					Fld借方税率:   e.Fld借方税率,
 					Fld合計金額:   e.Fld合計金額,

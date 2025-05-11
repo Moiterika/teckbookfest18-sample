@@ -43,13 +43,19 @@ func (x *按分結果明細XlsxWriter) Save(明細一覧 []*domain.Ent按分結�
 		}
 	}
 	// ヘッダー行を書き込み
-	headers := []interface{}{"計上年月", "勘定科目", "コストプール", "按分ルール1", "按分ルール2", "借方税区分", "借方税率", "合計金額", "按分先", "按分基準値", "按分誤差", "按分結果"}
+	headers := []interface{}{"計上年月", "原価要素", "コストプール", "按分ルール1", "按分ルール2", "直間", "借方税区分", "借方税率", "合計金額", "按分先", "按分基準値", "按分誤差", "按分結果"}
 	x.ef.SetSheetRow(sheet按分結果明細一覧, "A1", &headers)
 
 	// データ行を書き込み
 	for i, e := range 明細一覧 {
+		var 直間 string
+		if e.FldIs直接費 {
+			直間 = "直接費"
+		} else {
+			直間 = "間接費"
+		}
 		row := []interface{}{
-			e.Fld計上年月, e.Fld勘定科目, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, e.Fld借方税区分, e.Fld借方税率.String(), e.Fld合計金額.IntPart(), e.Fld按分先, e.Fld按分基準値.String(), e.Fld按分誤差.IntPart(), e.Fld按分結果.IntPart(),
+			e.Fld計上年月, e.Fld原価要素, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, 直間, e.Fld借方税区分, e.Fld借方税率.String(), e.Fld合計金額.IntPart(), e.Fld按分先, e.Fld按分基準値.String(), e.Fld按分誤差.IntPart(), e.Fld按分結果.IntPart(),
 		}
 		cell := fmt.Sprintf("A%d", i+2)
 		x.ef.SetSheetRow(sheet按分結果明細一覧, cell, &row)
