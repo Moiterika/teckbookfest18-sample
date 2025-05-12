@@ -43,7 +43,7 @@ func (w *集計仕訳XlsxWriter) Save(集計仕訳一覧 []*domain.Ent集計仕�
 	w.ef.SetSheetRow(sheet集計仕訳一覧, "A1", &headers)
 	// データ行を書き込み
 	for i, e := range 集計仕訳一覧 {
-		row := []interface{}{e.Fld計上年月, e.Fld勘定科目, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, e.Fld借方税区分, e.Fld借方税率.IntPart(), e.Fld合計金額.IntPart()}
+		row := []interface{}{e.Fld計上年月, e.Fld原価要素, e.Fldコストプール, e.Fld按分ルール1, e.Fld按分ルール2, e.Fld借方税区分, e.Fld借方税率.IntPart(), e.Fld合計金額.IntPart()}
 		cell := fmt.Sprintf("A%d", i+2)
 		w.ef.SetSheetRow(sheet集計仕訳一覧, cell, &row)
 	}

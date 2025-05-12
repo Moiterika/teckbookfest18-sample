@@ -26,7 +26,7 @@ func (l *List集計仕訳) Get() []*Ent集計仕訳 {
 		合計金額, _ := l.List.Get(key)
 		集計仕訳一覧 = append(集計仕訳一覧, &Ent集計仕訳{
 			Fld計上年月:   key.Fld計上年月,
-			Fld勘定科目:   key.Fld原価要素,
+			Fld原価要素:   key.Fld原価要素,
 			Fldコストプール: key.Fldコストプール,
 			Fld按分ルール1: key.Fld按分ルール1,
 			Fld按分ルール2: key.Fld按分ルール2,

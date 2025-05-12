@@ -89,22 +89,22 @@ func main() {
 	按分ルール一覧xlsx := io.New按分ルールXlsxIo(xlsxFile)
 	// XLSX按分結果明細ライターインスタンスを作成
 	按分結果明細xlsx := io.New按分結果明細XlsxWriter(xlsxFile)
+	// XLSX按分結果ライターインスタンスを作成
+	按分結果xlsx := io.New按分結果XlsxWriter(xlsxFile)
 
 	// Service配賦インスタンスを作成
-	配賦サービス := domain.NewService配賦(按分ルール一覧xlsx, 按分結果明細xlsx)
+	配賦サービス := domain.NewService配賦(按分ルール一覧xlsx, 按分結果明細xlsx, 按分結果xlsx)
 	按分ルール一覧, err := 配賦サービス.Query按分ルール一覧()
 	if err != nil {
 		fmt.Printf("按分ルール処理エラー: %v\n", err)
 		exitCode = 2
 		return
 	}
-	按分結果明細一覧, err := 配賦サービス.Execute配賦(集計仕訳一覧.Get(), 按分ルール一覧)
+	err = 配賦サービス.Execute配賦(集計仕訳一覧.Get(), 按分ルール一覧)
 	if err != nil {
 		fmt.Printf("按分ルール処理エラー: %v\n", err)
 		exitCode = 2
 		return
 	}
-	for _, e := range 按分結果明細一覧 {
-		fmt.Printf("%+v\n", e)
-	}
+
 }
