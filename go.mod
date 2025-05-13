@@ -4,7 +4,6 @@ go 1.23.7
 
 require (
 	github.com/Moiterika/a v0.0.0-20240720062856-cf0f723a4827
-	github.com/mattn/go-sqlite3 v1.14.28
 	github.com/shopspring/decimal v1.4.0
 	github.com/xuri/excelize/v2 v2.9.0
 )
