@@ -6,6 +6,8 @@
 - If file name or identifier name are Japanese word, don't rename to English or "roma-ji".
 - read 方針（人間） and 方針（Copilot Agent） in `./memo.md`
 - rewrite 方針（Copilot Agent） for task manegement when answer or programming.
+- Don't add any package from github.com or go.dev.
+  - If you need to add a package, ask me first.
 
 ## Architecture
 
@@ -16,11 +18,10 @@
   - domain
     - entity files
     - interface files
-      - i.e. database repository interface
+      - i.e. reading/writing file interface
   - io
-    - excel reader/writer
-    - csv reader
-    - database repository implement
+    - excel reader/writer implement
+    - csv reader/writer implement
 
 ## Naming
 

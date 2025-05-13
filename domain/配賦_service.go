@@ -97,10 +97,10 @@ func (s *Service配賦) Execute配賦(集計仕訳一覧 []*Ent集計仕訳, 按
 					Fld借方税率:   e.Fld借方税率,
 					Fld合計金額:   e.Fld合計金額,
 					// 按分結果の情報をセット
-					Fld按分先:   r.Original.Fld按分先,   // 挹分ルールの按分先
-					Fld按分基準値: r.Original.Fld按分基準値, // 挹分ルールの按分基準値
+					Fld按分先:   r.Original.Fld按分先,   // 按分ルールの按分先
+					Fld按分基準値: r.Original.Fld按分基準値, // 按分ルールの按分基準値
 					Fld按分誤差:  r.DiffValue,         // 按分誤差
-					Fld按分結果:  r.AllocatedValue,    // 挹分後の金額
+					Fld按分結果:  r.AllocatedValue,    // 按分後の金額
 				})
 			}
 		}
