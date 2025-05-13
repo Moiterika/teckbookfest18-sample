@@ -4,7 +4,7 @@ import "github.com/shopspring/decimal"
 
 type Ent集計仕訳 struct {
 	Fld計上年月   string
-	Fld勘定科目   string
+	Fld原価要素   string
 	Fldコストプール string
 	Fld按分ルール1 string
 	Fld按分ルール2 string

@@ -4,10 +4,11 @@ import "github.com/shopspring/decimal"
 
 type Ent按分結果明細 struct {
 	Fld計上年月   string
-	Fld勘定科目   string
+	Fld原価要素   string
 	Fldコストプール string
 	Fld按分ルール1 string
 	Fld按分ルール2 string
+	FldIs直接費  bool
 	Fld借方税区分  string
 	Fld借方税率   decimal.Decimal
 	Fld合計金額   decimal.Decimal
