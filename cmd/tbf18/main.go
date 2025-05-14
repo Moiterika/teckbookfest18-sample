@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"os"
 
@@ -12,6 +13,34 @@ import (
 )
 
 func main() {
+	// ヘルプフラグの定義（オプション引数として残す）
+	helpFlag := flag.Bool("help", false, "ヘルプを表示")
+	flag.Parse()
+
+	// ヘルプフラグが指定された場合、使用方法を表示して終了
+	if *helpFlag {
+		fmt.Println("使用方法: ./tbf18 [CSVファイルパス] [Excelファイルパス]")
+		fmt.Println("デフォルト値:")
+		fmt.Println("  CSVファイルパス: ./sample_data.csv")
+		fmt.Println("  Excelファイルパス: ./按分サンプル.xlsx")
+		fmt.Println("\nオプション:")
+		flag.PrintDefaults()
+		return
+	}
+
+	// 位置引数の処理
+	args := flag.Args()
+	csvFilePath := "./sample_data.csv" // デフォルト値
+	xlsxFilePath := "./按分サンプル.xlsx"    // デフォルト値
+
+	// 引数の数に応じて処理
+	if len(args) >= 1 {
+		csvFilePath = args[0]
+	}
+	if len(args) >= 2 {
+		xlsxFilePath = args[1]
+	}
+
 	exitCode := 0
 	defer func() {
 		if exitCode != 0 {
@@ -21,9 +50,9 @@ func main() {
 	}()
 
 	// CSVファイルを開く
-	csvFile, err := os.Open("./sample_data.csv")
+	csvFile, err := os.Open(csvFilePath)
 	if err != nil {
-		fmt.Printf("CSVファイルを開けませんでした: %v\n", err)
+		fmt.Printf("CSVファイル '%s' を開けませんでした: %v\n", csvFilePath, err)
 		exitCode = 1
 		return
 	}
@@ -38,9 +67,9 @@ func main() {
 	csvReader := io.New仕訳CsvReader(reader)
 
 	// xlsxファイルを開く
-	xlsxFile, err := excelize.OpenFile("./按分サンプル.xlsx") // xlsxファイルのパスを適切に設定してください
+	xlsxFile, err := excelize.OpenFile(xlsxFilePath)
 	if err != nil {
-		fmt.Printf("xlsxファイルを開けませんでした: %v\n", err)
+		fmt.Printf("xlsxファイル '%s' を開けませんでした: %v\n", xlsxFilePath, err)
 		exitCode = 1
 		return
 	}

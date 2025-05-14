@@ -5,10 +5,10 @@
 ## 機能概要
 
 - 仕訳データのCSV/Excelファイル読み込み
-- 勤務表データからの工数集計
+- 集計仕訳の作成と出力
+- 勤務表データからの工数集計（別ツールmhgによる処理）
 - 按分ルールに基づく按分計算
 - 按分結果のExcel出力
-- 集計仕訳の作成と出力
 
 ## プロジェクト構成
 
@@ -25,12 +25,21 @@ io/         - ファイル入出力の実装
 ### 按分計算 (tbf18)
 
 ```bash
+# デフォルトファイルを使用する場合
 cd cmd/tbf18
 go run main.go
+
+# CSVファイルとExcelファイルを指定する場合
+cd cmd/tbf18
+go run main.go data.csv workbook.xlsx
+
+# ヘルプを表示
+cd cmd/tbf18
+go run main.go -help
 ```
 
 按分計算を実行します。
-サンプルデータとして`sample_data.csv`と`按分サンプル.xlsx`を使用します。
+引数を指定しない場合は、サンプルデータとして`sample_data.csv`と`按分サンプル.xlsx`を使用します。
 
 ### 勤務表処理 (mhg)
 
@@ -56,6 +65,13 @@ GOOS=windows GOARCH=amd64 go build -o ../tbf18/mhg.exe
 ```
 
 生成された `.exe` ファイルはWindows環境で実行できます。
+
+```bash
+# Windows環境での実行例
+tbf18.exe                        # デフォルトファイルを使用
+tbf18.exe data.csv workbook.xlsx # 独自のファイルパスを指定
+tbf18.exe -help                  # ヘルプを表示
+```
 
 ## 開発環境
 
