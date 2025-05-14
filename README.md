@@ -29,7 +29,7 @@ io/         - ファイル入出力の実装
 cd cmd/tbf18
 go run main.go
 
-# CSVファイルとExcelファイルを指定する場合
+# CSVファイルとExcelファイルを指定する例
 cd cmd/tbf18
 go run main.go data.csv workbook.xlsx
 
