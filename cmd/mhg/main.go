@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -11,6 +12,34 @@ import (
 )
 
 func main() {
+	// ヘルプフラグの定義（オプション引数として残す）
+	helpFlag := flag.Bool("help", false, "ヘルプを表示")
+	flag.Parse()
+
+	// ヘルプフラグが指定された場合、使用方法を表示して終了
+	if *helpFlag {
+		fmt.Println("使用方法: ./mhg [勤務表ファイルパス] [出力Excelファイルパス]")
+		fmt.Println("デフォルト値:")
+		fmt.Println("  勤務表ファイルパス: ./勤務表_2024.xlsx")
+		fmt.Println("  出力Excelファイルパス: ../tbf18/按分サンプル.xlsx")
+		fmt.Println("\nオプション:")
+		flag.PrintDefaults()
+		return
+	}
+
+	// 位置引数の処理
+	args := flag.Args()
+	勤務表FilePath := "./勤務表_2024.xlsx"         // デフォルト値
+	outputFilePath := "../tbf18/按分サンプル.xlsx" // デフォルト値
+
+	// 引数の数に応じて処理
+	if len(args) >= 1 {
+		勤務表FilePath = args[0]
+	}
+	if len(args) >= 2 {
+		outputFilePath = args[1]
+	}
+
 	exitCode := 0
 	defer func() {
 		if exitCode != 0 {
@@ -19,17 +48,17 @@ func main() {
 		os.Exit(exitCode)
 	}()
 	// xlsxファイルを開く
-	勤務表xlsx, err := excelize.OpenFile("./勤務表_2024.xlsx") // パスは必要に応じて調整
+	勤務表xlsx, err := excelize.OpenFile(勤務表FilePath)
 	if err != nil {
-		fmt.Printf("xlsxファイルを開けませんでした: %v\n", err)
+		fmt.Printf("勤務表ファイル '%s' を開けませんでした: %v\n", 勤務表FilePath, err)
 		exitCode = 1
 		return
 	}
 	defer 勤務表xlsx.Close()
 
-	outputXlsx, err := excelize.OpenFile("../tbf18/按分サンプル.xlsx") // パスは必要に応じて調整
+	outputXlsx, err := excelize.OpenFile(outputFilePath)
 	if err != nil {
-		fmt.Printf("xlsxファイルを開けませんでした: %v\n", err)
+		fmt.Printf("出力Excelファイル '%s' を開けませんでした: %v\n", outputFilePath, err)
 		exitCode = 1
 		return
 	}

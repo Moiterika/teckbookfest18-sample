@@ -44,11 +44,21 @@ go run main.go -help
 ### 勤務表処理 (mhg)
 
 ```bash
+# デフォルトファイルを使用する場合
 cd cmd/mhg
 go run main.go
+
+# 勤務表ファイルと出力ファイルを指定する場合
+cd cmd/mhg
+go run main.go 勤務表.xlsx 出力.xlsx
+
+# ヘルプを表示
+cd cmd/mhg
+go run main.go -help
 ```
 
 勤務表から工数集計を行います。
+引数を指定しない場合は、デフォルトで`勤務表_2024.xlsx`と`../tbf18/按分サンプル.xlsx`を使用します。
 
 ## ビルド方法
 
@@ -67,10 +77,15 @@ GOOS=windows GOARCH=amd64 go build -o ../tbf18/mhg.exe
 生成された `.exe` ファイルはWindows環境で実行できます。
 
 ```bash
-# Windows環境での実行例
+# Windows環境での実行例（tbf18）
 tbf18.exe                        # デフォルトファイルを使用
 tbf18.exe data.csv workbook.xlsx # 独自のファイルパスを指定
 tbf18.exe -help                  # ヘルプを表示
+
+# Windows環境での実行例（mhg）
+mhg.exe                          # デフォルトファイルを使用
+mhg.exe 勤務表.xlsx 出力.xlsx     # 独自のファイルパスを指定
+mhg.exe -help                    # ヘルプを表示
 ```
 
 ## 開発環境
