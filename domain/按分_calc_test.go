@@ -98,17 +98,17 @@ func TestCalc按分(t *testing.T) {
 		{
 			name:         "異なる重みでの丸め誤差",
 			total:        decimal.NewFromInt(100),
-			items:        []testItem{{"A", decimal.NewFromInt(10)}, {"B", decimal.NewFromInt(20)}, {"C", decimal.NewFromInt(15)}},
+			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(3)}, {"C", decimal.NewFromInt(2)}},
 			scale:        0,
-			roundingMode: RoundHalfUp,
+			roundingMode: RoundDown, // RoundDownでの丸め
 			expectedAllocated: []decimal.Decimal{
-				decimal.NewFromInt(22),
-				decimal.NewFromInt(45),
-				decimal.NewFromInt(33),
+				decimal.NewFromInt(16), // A: 1/6*100=16.666...→16
+				decimal.NewFromInt(51), // B: 3/6*100=50→51 (誤差調整)
+				decimal.NewFromInt(33), // C: 2/6*100=33.333...→33
 			},
 			expectedDiff: []decimal.Decimal{
 				decimal.Zero,
-				decimal.NewFromInt(1),
+				decimal.NewFromInt(1), // Bに誤差調整
 				decimal.Zero,
 			},
 			expectedDiffItemName: "B",
