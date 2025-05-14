@@ -23,7 +23,7 @@ const (
 	RoundUp
 )
 
-// allocateConfig は ProportionalAllocate 関数の内部設定を保持します。
+// allocateConfig は Calc按分 関数の内部設定を保持します。
 type allocateConfig struct {
 	scale        int32        // 計算結果の小数点以下の桁数
 	roundingMode roundingMode // 丸め方法
@@ -55,7 +55,6 @@ func WithRoundingMode(mode roundingMode) OptionFunc {
 }
 
 // Calc按分 は按分計算の関数です。
-// func ProportionalAllocate[T any](
 func Calc按分[T any](
 	total decimal.Decimal,
 	items []T,
