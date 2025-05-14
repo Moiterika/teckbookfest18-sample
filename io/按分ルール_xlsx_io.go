@@ -70,7 +70,7 @@ func (x *按分ルールXlsxIo) Save(按分ルール一覧 []*domain.Ent按分�
 	// データ行を書き込み
 	for i, e := range 按分ルール一覧 {
 		row := []interface{}{
-			e.Fld按分ルール1, e.Fld按分ルール2, e.Fld按分先, e.Fld按分基準値.String(),
+			e.Fld按分ルール1, e.Fld按分ルール2, e.Fld按分先, e.Fld按分基準値.IntPart(),
 		}
 		cell := fmt.Sprintf("A%d", i+2)
 		x.ef.SetSheetRow(sheet按分ルール一覧, cell, &row)
