@@ -4,8 +4,6 @@
 
 - Write Japanese comment
 - If file name or identifier name are Japanese word, don't rename to English or "roma-ji".
-- read 方針（人間） and 方針（Copilot Agent） in `./memo.md`
-- rewrite 方針（Copilot Agent） for task manegement when answer or programming.
 - Don't add any package from github.com or go.dev.
   - If you need to add a package, ask me first.
 
@@ -13,6 +11,8 @@
 
 - This project has the directory structure.
   - cmd
+    - mhg
+      - mhg is the ManHour Grouping tool.
     - tbf18
       - main.go is the application layer.
   - domain
