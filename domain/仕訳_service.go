@@ -8,15 +8,17 @@ import (
 )
 
 type Service仕訳 struct {
-	csv  I仕訳CsvReader
-	xlsx I仕訳XlsxIo
+	csv      I仕訳CsvReader
+	仕訳xlsx   I仕訳XlsxIo
+	勘定科目xlsx I勘定科目XlsxReader
 }
 
 // NewService仕訳 は Service仕訳 のインスタンスを作成します
-func NewService仕訳(csv I仕訳CsvReader, xlsx I仕訳XlsxIo) *Service仕訳 {
+func NewService仕訳(csv I仕訳CsvReader, 仕訳xlsx I仕訳XlsxIo, 勘定科目xlsx I勘定科目XlsxReader) *Service仕訳 {
 	return &Service仕訳{
-		csv:  csv,
-		xlsx: xlsx,
+		csv:      csv,
+		仕訳xlsx:   仕訳xlsx,
+		勘定科目xlsx: 勘定科目xlsx,
 	}
 }
 
@@ -32,7 +34,7 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 	}
 
 	// 2. xlsxから仕訳データを読み取る
-	xlsxRows, err := s.xlsx.Read仕訳一覧()
+	xlsxRows, err := s.仕訳xlsx.Read仕訳一覧()
 	if err != nil {
 		err = fmt.Errorf("xlsxの「仕訳一覧」読込でエラー: %w", err)
 		fmt.Printf("%v\n", err)
@@ -48,7 +50,7 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 	}
 
 	// 3. xlsxの勘定科目を読み込む
-	勘定科目一覧, err := s.xlsx.Read勘定科目一覧()
+	勘定科目一覧, err := s.勘定科目xlsx.Read勘定科目一覧()
 	if err != nil {
 		err = fmt.Errorf("xlsxの「勘定科目一覧」読込でエラー: %w", err)
 		fmt.Printf("%v\n", err)
@@ -64,12 +66,11 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 	}
 
 	// 2. CSVで読み取った仕訳にxlsxの仕訳詳細をマージする
-	var hasErr bool
 	for i, csvRow := range csvRows {
 		// 計上年月
 		t, err := time.Parse("2006/01/02", csvRow.Fld取引日) // YYYY/MM/DD
 		if err != nil {
-			err = fmt.Errorf("CSV%d行目の取引日がYYYY/MM/DD形式ではありません。: %w", i+1, err)
+			err = fmt.Errorf("CSV%d行目の取引日がYYYY/MM/DD形式ではありません。: %w", i+2, err)
 			fmt.Printf("%v\n", err)
 			return nil, err
 		}
@@ -79,7 +80,7 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 			csvRow.Val仕訳詳細 = csvRow.GetVal仕訳詳細From(x) // xlsxにある仕訳詳細を取得してマージ
 			// 取引日変更で計上年月が違っている場合、警告
 			if csvRow.Val仕訳詳細 != nil && csvRow.Fld計上年月 != "" && csvRow.Fld計上年月 != 計上年月 {
-				fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+1, csvRow.Fld計上年月, csvRow.Fld取引日)
+				fmt.Printf("【警告】仕訳一覧%d行目:計上年月が取引日と違います。計上年月=%s、取引日=%s\n", i+2, csvRow.Fld計上年月, csvRow.Fld取引日)
 			}
 			continue
 		}
@@ -105,13 +106,28 @@ func (s *Service仕訳) Query仕訳一覧() ([]*Ent仕訳, error) {
 			}
 			continue
 		}
-		hasErr = true
-		fmt.Printf("仕訳一覧%d行目: 按分ルールが未定義です。\n", i+1)
+	}
+
+	return csvRows, nil
+}
+
+func (s *Service仕訳) Save(仕訳一覧 []*Ent仕訳) error {
+	err := s.仕訳xlsx.Save(仕訳一覧)
+	if err != nil {
+		return err
+	}
+
+	var hasErr bool
+	for i, e := range 仕訳一覧 {
+		if e.Val仕訳詳細 == nil {
+			fmt.Printf("仕訳一覧%d行目: 按分ルールが未定義です。\n", i+2)
+			hasErr = true
+		}
 	}
 	if hasErr {
-		return csvRows, Error未定義仕訳
+		return Error未定義仕訳
 	}
-	return csvRows, nil
+	return nil
 }
 
 func (s *Service仕訳) Query集計仕訳(仕訳一覧 []*Ent仕訳) (List集計仕訳, error) {

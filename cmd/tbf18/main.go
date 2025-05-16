@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -78,21 +79,25 @@ func main() {
 	// XLSX仕訳IOインスタンスを作成
 	仕訳一覧xlsx := io.New仕訳XlsxIo(xlsxFile)
 
+	// 勘定科目Readerインスタンスを作成
+	勘定科目xlsx := io.New勘定科目XlsxReader(xlsxFile)
+
 	// Service仕訳インスタンスを作成
-	仕訳サービス := domain.NewService仕訳(csvReader, 仕訳一覧xlsx)
+	仕訳サービス := domain.NewService仕訳(csvReader, 仕訳一覧xlsx, 勘定科目xlsx)
 
 	// Service仕訳を実行
 	仕訳一覧, err := 仕訳サービス.Query仕訳一覧()
-	if err != nil && err != domain.Error未定義仕訳 {
+	if err != nil {
 		fmt.Printf("仕訳処理エラー: %v\n", err)
 		exitCode = 1
 		return
-	} else if err == domain.Error未定義仕訳 {
-		仕訳一覧xlsx.Save(仕訳一覧)
+	}
+	err = 仕訳サービス.Save(仕訳一覧)
+	if errors.Is(err, domain.Error未定義仕訳) {
+		fmt.Printf("仕訳一覧シートのA～E列に記入して下さい。\n")
 		exitCode = 2
 		return
 	}
-	err = 仕訳一覧xlsx.Save(仕訳一覧)
 	if err != nil {
 		fmt.Printf("仕訳データの保存エラー: %v\n", err)
 		exitCode = 2
@@ -135,5 +140,4 @@ func main() {
 		exitCode = 2
 		return
 	}
-
 }
