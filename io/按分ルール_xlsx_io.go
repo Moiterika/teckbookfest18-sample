@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 按分ルールXlsxIo は I按分ルールXlsxIo の実装です
+// 按分ルールXlsxIo は Rep按分ルール の実装です
 // 按分ルールデータのxlsxファイル読み書きを担当します
 type 按分ルールXlsxIo struct {
 	ef *excelize.File

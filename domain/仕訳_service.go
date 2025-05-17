@@ -8,13 +8,13 @@ import (
 )
 
 type Service仕訳 struct {
-	csv      I仕訳CsvReader
-	仕訳xlsx   I仕訳XlsxIo
-	勘定科目xlsx I勘定科目XlsxReader
+	csv      Qry仕訳
+	仕訳xlsx   Rep仕訳
+	勘定科目xlsx Qry勘定科目
 }
 
 // NewService仕訳 は Service仕訳 のインスタンスを作成します
-func NewService仕訳(csv I仕訳CsvReader, 仕訳xlsx I仕訳XlsxIo, 勘定科目xlsx I勘定科目XlsxReader) *Service仕訳 {
+func NewService仕訳(csv Qry仕訳, 仕訳xlsx Rep仕訳, 勘定科目xlsx Qry勘定科目) *Service仕訳 {
 	return &Service仕訳{
 		csv:      csv,
 		仕訳xlsx:   仕訳xlsx,

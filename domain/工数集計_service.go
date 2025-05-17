@@ -9,12 +9,12 @@ import (
 
 // Service工数集計 は工数集計関連のサービスを提供します
 type Service工数集計 struct {
-	勤務表Reader I勤務表XlsxReader
-	按分ルールIo   I按分ルールXlsxIo
+	勤務表Reader Qry勤務表
+	按分ルールIo   Rep按分ルール
 }
 
 // NewService工数集計 は Service工数集計 のインスタンスを作成します
-func NewService工数集計(勤務表Reader I勤務表XlsxReader, 按分ルールIo I按分ルールXlsxIo) *Service工数集計 {
+func NewService工数集計(勤務表Reader Qry勤務表, 按分ルールIo Rep按分ルール) *Service工数集計 {
 	return &Service工数集計{
 		勤務表Reader: 勤務表Reader,
 		按分ルールIo:   按分ルールIo,
@@ -25,7 +25,7 @@ func NewService工数集計(勤務表Reader I勤務表XlsxReader, 按分ルー�
 // 勤務表を読み込み、按分ルールを生成して保存する一連の処理を行います
 func (s *Service工数集計) Execute工数集計() error {
 	// 勤務表データを読み取る
-	勤務表一覧, err := s.勤務表Reader.ReadAll()
+	勤務表一覧, err := s.勤務表Reader.Read勤務表()
 	if err != nil {
 		err = fmt.Errorf("勤務表の読み込みに失敗: %w", err)
 		return err
