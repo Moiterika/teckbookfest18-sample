@@ -10,11 +10,11 @@ import (
 )
 
 // モックの作成
-type MockRep按分ルール struct {
+type Mock配賦Rep按分ルール struct {
 	mock.Mock
 }
 
-func (m *MockRep按分ルール) Read按分ルール一覧() ([]*Ent按分ルール, error) {
+func (m *Mock配賦Rep按分ルール) Read按分ルール一覧() ([]*Ent按分ルール, error) {
 	args := m.Called()
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -22,7 +22,7 @@ func (m *MockRep按分ルール) Read按分ルール一覧() ([]*Ent按分ルー
 	return args.Get(0).([]*Ent按分ルール), args.Error(1)
 }
 
-func (m *MockRep按分ルール) Save([]*Ent按分ルール) error {
+func (m *Mock配賦Rep按分ルール) Save([]*Ent按分ルール) error {
 	return nil // このテストでは使用しないのでnilを返す
 }
 
@@ -70,7 +70,7 @@ func createSample集計仕訳(計上年月 string, 原価要素 string, コス�
 // テスト
 func TestNewService配賦(t *testing.T) {
 	// モックの作成
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -86,7 +86,7 @@ func TestNewService配賦(t *testing.T) {
 
 func TestQuery按分ルール一覧_正常系(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -118,7 +118,7 @@ func TestQuery按分ルール一覧_正常系(t *testing.T) {
 
 func TestQuery按分ルール一覧_エラー系(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -141,7 +141,7 @@ func TestQuery按分ルール一覧_エラー系(t *testing.T) {
 
 func TestExecute配賦_直課(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -187,7 +187,7 @@ func TestExecute配賦_直課(t *testing.T) {
 
 func TestExecute配賦_按分(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -248,7 +248,7 @@ func TestExecute配賦_按分(t *testing.T) {
 
 func TestExecute配賦_按分ルール未定義(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -278,7 +278,7 @@ func TestExecute配賦_按分ルール未定義(t *testing.T) {
 
 func TestExecute配賦_按分誤差(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
@@ -337,7 +337,7 @@ func TestExecute配賦_按分ルール重複エラー(t *testing.T) {
 
 func TestExecute配賦_保存エラー(t *testing.T) {
 	// モック準備
-	mockRep按分ルール := new(MockRep按分ルール)
+	mockRep按分ルール := new(Mock配賦Rep按分ルール)
 	mockCmd按分結果明細 := new(MockCmd按分結果明細)
 	mockCmd按分結果 := new(MockCmd按分結果)
 
