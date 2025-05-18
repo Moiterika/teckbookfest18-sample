@@ -13,14 +13,13 @@ func TestCalc按分(t *testing.T) {
 	}
 
 	type testCase struct {
-		name                 string
-		total                decimal.Decimal
-		items                []testItem
-		scale                int32
-		roundingMode         roundingMode
-		expectedAllocated    []decimal.Decimal
-		expectedDiff         []decimal.Decimal
-		expectedDiffItemName string // 誤差調整が適用される要素の名前
+		name              string
+		total             decimal.Decimal
+		items             []testItem
+		scale             int32
+		roundingMode      roundingMode
+		expectedAllocated []decimal.Decimal
+		expectedDiff      []decimal.Decimal
 	}
 
 	tests := []testCase{
@@ -57,7 +56,6 @@ func TestCalc按分(t *testing.T) {
 				decimal.Zero,
 				decimal.Zero,
 			},
-			expectedDiffItemName: "A",
 		},
 		{
 			name:         "RoundDownでの丸め誤差",
@@ -75,7 +73,6 @@ func TestCalc按分(t *testing.T) {
 				decimal.Zero,
 				decimal.Zero,
 			},
-			expectedDiffItemName: "A",
 		},
 		{
 			name:         "RoundUpでの丸め誤差",
@@ -93,7 +90,6 @@ func TestCalc按分(t *testing.T) {
 				decimal.Zero,
 				decimal.Zero,
 			},
-			expectedDiffItemName: "A",
 		},
 		{
 			name:         "異なる重みでの丸め誤差",
@@ -111,7 +107,6 @@ func TestCalc按分(t *testing.T) {
 				decimal.NewFromInt(1), // Bに誤差調整
 				decimal.Zero,
 			},
-			expectedDiffItemName: "B",
 		},
 	}
 
@@ -152,13 +147,6 @@ func TestCalc按分(t *testing.T) {
 				if !tc.expectedDiff[i].Equal(res.DiffValue) {
 					t.Errorf("Item %s DiffValue mismatch: expected %v, got %v",
 						item.Name, tc.expectedDiff[i], res.DiffValue)
-				}
-
-				// 誤差調整が期待される要素の確認
-				if tc.expectedDiffItemName != "" && item.Name == tc.expectedDiffItemName {
-					if res.DiffValue.IsZero() {
-						t.Errorf("Expected diff adjustment on item %s, but DiffValue is zero", item.Name)
-					}
 				}
 			}
 		})
