@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 仕訳XlsxIo は I仕訳XlsxIo の実装です
+// 仕訳XlsxIo は Rep仕訳 の実装です
 // 仕訳データのxlsxファイル読み書きを担当します
 type 仕訳XlsxIo struct {
 	ef *excelize.File

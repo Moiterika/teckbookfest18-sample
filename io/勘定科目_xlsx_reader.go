@@ -6,7 +6,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 勘定科目XlsxReader は I勘定科目XlsxReader の実装です
+// 勘定科目XlsxReader は Qry勘定科目 の実装です
 // 勘定科目データのxlsxファイル読み取りを担当します
 type 勘定科目XlsxReader struct {
 	ef *excelize.File

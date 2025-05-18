@@ -6,13 +6,13 @@ import (
 	"teckbookfest18-sample/domain"
 )
 
-// 仕訳CsvReader はI仕訳CsvReaderインターフェースの実装です
+// 仕訳CsvReader はQry仕訳インターフェースの実装です
 type 仕訳CsvReader struct {
 	reader *csv.Reader // CSVリーダーをプライベートフィールドとして保持
 }
 
 // New仕訳CsvReader は仕訳CsvReaderの新しいインスタンスを作成します
-func New仕訳CsvReader(reader *csv.Reader) domain.I仕訳CsvReader {
+func New仕訳CsvReader(reader *csv.Reader) domain.Qry仕訳 {
 	return &仕訳CsvReader{
 		reader: reader,
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 集計仕訳XlsxWriter は I集計仕訳XlsxWriter の実装です
+// 集計仕訳XlsxWriter は Cmd集計仕訳 の実装です
 // 集計仕訳データをxlsxファイルに書き出します
 type 集計仕訳XlsxWriter struct {
 	ef *excelize.File

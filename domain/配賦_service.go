@@ -9,13 +9,13 @@ import (
 )
 
 type Service配賦 struct {
-	按分ルールxlsx  I按分ルールXlsxIo
-	按分結果明細xlsx I按分結果明細XlsxWriter
-	按分結果xlsx   I按分結果XlsxWriter
+	按分ルールxlsx  Rep按分ルール
+	按分結果明細xlsx Cmd按分結果明細
+	按分結果xlsx   Cmd按分結果
 }
 
 // NewService配賦 は配賦サービスを生成します
-func NewService配賦(xlsx I按分ルールXlsxIo, 按分結果明細xlsx I按分結果明細XlsxWriter, 按分結果xlsx I按分結果XlsxWriter) *Service配賦 {
+func NewService配賦(xlsx Rep按分ルール, 按分結果明細xlsx Cmd按分結果明細, 按分結果xlsx Cmd按分結果) *Service配賦 {
 	return &Service配賦{
 		按分ルールxlsx:  xlsx,
 		按分結果明細xlsx: 按分結果明細xlsx,

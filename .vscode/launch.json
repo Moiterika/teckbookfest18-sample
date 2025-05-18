@@ -11,6 +11,10 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/tbf18/",
             "cwd": "${workspaceFolder}/cmd/tbf18/",
+            "args": [
+                "sample_data.csv",
+                "按分サンプル.xlsx"
+            ]
         }
     ]
 }

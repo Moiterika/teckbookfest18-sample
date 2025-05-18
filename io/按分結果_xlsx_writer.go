@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 按分結果XlsxWriterはdomain.I按分結果XlsxWriterの実装です
+// 按分結果XlsxWriter はCmd按分結果の実装です
 // 按分結果データのxlsxファイルへの保存のみを担当します
 // 読み込み処理は実装しません
 // 実体はio層で管理し、domain層のインターフェースに従います

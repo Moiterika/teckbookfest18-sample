@@ -7,7 +7,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// 勤務表XlsxReader は I勤務表XlsxReader の実装です
+// 勤務表XlsxReader は Qry勤務表 の実装です
 // 勤務表データのxlsxファイル読み取りを担当します
 type 勤務表XlsxReader struct {
 	ef *excelize.File
@@ -28,8 +28,8 @@ const (
 	FldIdx経費按分用の計上月  = 9
 )
 
-// ReadAll は勤務表データを読み取ります
-func (x *勤務表XlsxReader) ReadAll() ([]*domain.Ent勤務表, error) {
+// Read勤務表 は勤務表データを読み取ります
+func (x *勤務表XlsxReader) Read勤務表() ([]*domain.Ent勤務表, error) {
 	rows, err := x.ef.GetRows(sheet勤務表)
 	if err != nil {
 		return make([]*domain.Ent勤務表, 0), err
