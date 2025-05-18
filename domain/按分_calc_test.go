@@ -24,9 +24,13 @@ func TestCalc按分(t *testing.T) {
 
 	tests := []testCase{
 		{
-			name:         "基本的な按分計算",
-			total:        decimal.NewFromInt(600),
-			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(2)}, {"C", decimal.NewFromInt(3)}},
+			name:  "基本的な按分計算",
+			total: decimal.NewFromInt(600),
+			items: []testItem{
+				{"A", decimal.NewFromInt(1)},
+				{"B", decimal.NewFromInt(2)},
+				{"C", decimal.NewFromInt(3)},
+			},
 			scale:        0,
 			roundingMode: RoundHalfUp,
 			expectedAllocated: []decimal.Decimal{
@@ -41,9 +45,13 @@ func TestCalc按分(t *testing.T) {
 			},
 		},
 		{
-			name:         "RoundHalfUpでの丸め誤差",
-			total:        decimal.NewFromInt(100),
-			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(1)}, {"C", decimal.NewFromInt(1)}},
+			name:  "RoundHalfUpでの丸め誤差",
+			total: decimal.NewFromInt(100),
+			items: []testItem{
+				{"A", decimal.NewFromInt(1)},
+				{"B", decimal.NewFromInt(1)},
+				{"C", decimal.NewFromInt(1)},
+			},
 			scale:        0,
 			roundingMode: RoundHalfUp,
 			expectedAllocated: []decimal.Decimal{
@@ -58,9 +66,13 @@ func TestCalc按分(t *testing.T) {
 			},
 		},
 		{
-			name:         "RoundDownでの丸め誤差",
-			total:        decimal.NewFromInt(100),
-			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(1)}, {"C", decimal.NewFromInt(1)}},
+			name:  "RoundDownでの丸め誤差",
+			total: decimal.NewFromInt(100),
+			items: []testItem{
+				{"A", decimal.NewFromInt(1)},
+				{"B", decimal.NewFromInt(1)},
+				{"C", decimal.NewFromInt(1)},
+			},
 			scale:        0,
 			roundingMode: RoundDown,
 			expectedAllocated: []decimal.Decimal{
@@ -75,9 +87,13 @@ func TestCalc按分(t *testing.T) {
 			},
 		},
 		{
-			name:         "RoundUpでの丸め誤差",
-			total:        decimal.NewFromInt(100),
-			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(1)}, {"C", decimal.NewFromInt(1)}},
+			name:  "RoundUpでの丸め誤差",
+			total: decimal.NewFromInt(100),
+			items: []testItem{
+				{"A", decimal.NewFromInt(1)},
+				{"B", decimal.NewFromInt(1)},
+				{"C", decimal.NewFromInt(1)},
+			},
 			scale:        0,
 			roundingMode: RoundUp,
 			expectedAllocated: []decimal.Decimal{
@@ -92,9 +108,13 @@ func TestCalc按分(t *testing.T) {
 			},
 		},
 		{
-			name:         "異なる重みでの丸め誤差",
-			total:        decimal.NewFromInt(100),
-			items:        []testItem{{"A", decimal.NewFromInt(1)}, {"B", decimal.NewFromInt(3)}, {"C", decimal.NewFromInt(2)}},
+			name:  "異なる重みでの丸め誤差",
+			total: decimal.NewFromInt(100),
+			items: []testItem{
+				{"A", decimal.NewFromInt(1)},
+				{"B", decimal.NewFromInt(3)},
+				{"C", decimal.NewFromInt(2)},
+			},
 			scale:        0,
 			roundingMode: RoundDown, // RoundDownでの丸め
 			expectedAllocated: []decimal.Decimal{
@@ -154,7 +174,7 @@ func TestCalc按分(t *testing.T) {
 }
 
 // エラーケースのテスト
-func TestProportionalAllocateErrors(t *testing.T) {
+func TestCalc按分Errors(t *testing.T) {
 	tests := []struct {
 		name          string
 		total         decimal.Decimal
