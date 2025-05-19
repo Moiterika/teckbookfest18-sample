@@ -119,6 +119,7 @@ func (s *Service仕訳) query仕訳一覧() ([]*Ent仕訳, error) {
 
 			csvRow.Val仕訳詳細 = &Val仕訳詳細{
 				Fld計上年月:   計上年月,
+				Fld原価要素:   科目.Fld原価要素,
 				Fldコストプール: コストプール,
 				Fld按分ルール1: string(科目.Fld基本ルール),
 				Fld按分ルール2: 按分ルール2,
@@ -150,11 +151,11 @@ func (s *Service仕訳) query集計仕訳(仕訳一覧 []*Ent仕訳) (List集計
 	// 1. 集計仕訳を作成
 	集計仕訳一覧 := NewList集計仕訳()
 	var hasErr bool
-	for _, e := range 仕訳一覧 {
+	for i, e := range 仕訳一覧 {
 		key, err := newKey集計仕訳(e)
 		if err != nil {
 			hasErr = true
-			fmt.Printf("集計仕訳作成エラー: %v\n", err)
+			fmt.Printf("仕訳一覧%d行目: %v\n", i+2, err)
 			continue
 		}
 		if key.Fld按分ルール1 == "対象外" {
