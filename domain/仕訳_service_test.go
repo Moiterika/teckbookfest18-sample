@@ -300,6 +300,17 @@ func TestQuery集計仕訳(t *testing.T) {
 		}(),
 		func() *Ent仕訳 {
 			j := createSample仕訳()
+			j.Val仕訳詳細 = &Val仕訳詳細{
+				Fld計上年月:   "202405",
+				Fld原価要素:   "経費",
+				Fldコストプール: "営業部",
+				Fld按分ルール1: string(基本ルール_経費配賦),
+				Fld按分ルール2: "202405",
+			}
+			return j
+		}(),
+		func() *Ent仕訳 {
+			j := createSample仕訳()
 			j.FldNo = 2
 			j.Fld借方金額 = decimal.NewFromInt(5000)
 			j.Val仕訳詳細 = &Val仕訳詳細{
@@ -322,16 +333,14 @@ func TestQuery集計仕訳(t *testing.T) {
 	assert.NotNil(t, result)
 
 	// 「対象外」は集計しないため、1件のみ集計される
-	keys := result.List.Keys()
-	assert.Len(t, keys, 1)
+	集計仕訳一覧 := result.Get()
+	assert.Len(t, 集計仕訳一覧, 1)
 
 	// 集計結果の検証
-	key := keys[0]
-	assert.Equal(t, "202405", key.Fld計上年月)
-	assert.Equal(t, "営業部", key.Fldコストプール)
-	assert.Equal(t, "経費配賦", key.Fld按分ルール1)
-	assert.Equal(t, "202405", key.Fld按分ルール2)
-
-	value, _ := result.List.Get(key)
-	assert.Equal(t, decimal.NewFromInt(10000), value)
+	集計仕訳 := 集計仕訳一覧[0]
+	assert.Equal(t, "202405", 集計仕訳.Fld計上年月)
+	assert.Equal(t, "営業部", 集計仕訳.Fldコストプール)
+	assert.Equal(t, "経費配賦", 集計仕訳.Fld按分ルール1)
+	assert.Equal(t, "202405", 集計仕訳.Fld按分ルール2)
+	assert.Equal(t, decimal.NewFromInt(20000), 集計仕訳.Fld合計金額)
 }
