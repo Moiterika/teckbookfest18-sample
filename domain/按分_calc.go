@@ -46,8 +46,8 @@ func WithScale(scale int32) OptionFunc {
 }
 
 // WithRoundingMode は按分計算時の丸めモードを指定するオプションです。
-// 利用可能なモードは decimal パッケージの RoundingMode 定数 (RoundHalfUp, RoundFloor など) を参照してください。
-// デフォルト: decimal.RoundHalfUp (四捨五入)。
+// 利用可能なモードは RoundHalfUp (四捨五入), RoundDown (切り捨て), RoundUp (切り上げ) です。
+// デフォルト: RoundHalfUp (四捨五入)。
 func WithRoundingMode(mode roundingMode) OptionFunc {
 	return func(c *allocateConfig) {
 		c.roundingMode = mode
